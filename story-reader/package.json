@@ -7,8 +7,10 @@
     "packages/mobile"
   ],
   "scripts": {
-    "web": "npm run dev --workspace=packages/web",
+    "dev": "npm run dev --workspace=packages/web",
     "mobile": "npm run start --workspace=packages/mobile",
-    "build:shared": "npm run build --workspace=packages/shared"
+    "build": "npm run build --workspace=packages/web",
+    "test": "npm run test --workspace=packages/web",
+    "preview": "npm run preview --workspace=packages/web"
   }
 }

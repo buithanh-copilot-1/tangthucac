@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: story-reader-api
+    env: node
+    rootDir: story-reader-api
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: node dist/main
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: story-reader-db
+          property: connectionString
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+databases:
+  - name: story-reader-db
+    databaseName: story_reader
+    user: story_reader_user
+    plan: free
