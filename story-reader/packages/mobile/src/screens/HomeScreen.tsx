@@ -7,7 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { mockStories, categories, formatNumber } from '@story-reader/shared';
+import { mockStories, categories, formatNumber, translate, type TranslationKey } from '@story-reader/shared';
+import { useStore } from '../store/useStore';
 import StoryCard from '../components/StoryCard';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -22,6 +23,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const navigation = useNavigation<Nav>();
+  const { readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
   const [bannerIndex, setBannerIndex] = useState(0);
 
   useEffect(() => {
@@ -58,18 +61,18 @@ export default function HomeScreen() {
           <Image source={{ uri: banner.cover }} style={styles.bannerImg} resizeMode="cover" />
           <View style={styles.bannerOverlay} />
           <View style={styles.bannerContent}>
-            <View style={styles.featuredRow}>
-              <Ionicons name="trending-up" size={12} color="#f87171" />
-              <Text style={styles.featuredLabel}>NỔI BẬT</Text>
-            </View>
+              <View style={styles.featuredRow}>
+                <Ionicons name="trending-up" size={12} color="#f87171" />
+                <Text style={styles.featuredLabel}>{t('featuredLabel')}</Text>
+              </View>
             <Text style={styles.bannerTitle} numberOfLines={1}>{banner.title}</Text>
-            <Text style={styles.bannerSub}>{banner.author} · {formatNumber(banner.views)} lượt đọc</Text>
+              <Text style={styles.bannerSub}>{banner.author} · {formatNumber(banner.views)} {t('viewsLabel')}</Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('StoryDetail', { id: banner.id })}
               style={styles.readBtn}
             >
               <Ionicons name="book-outline" size={14} color="#fff" />
-              <Text style={styles.readBtnText}>Đọc ngay</Text>
+                <Text style={styles.readBtnText}>{t('readNow')}</Text>
             </TouchableOpacity>
           </View>
           {/* Dots */}
@@ -87,9 +90,9 @@ export default function HomeScreen() {
         {/* Categories */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Thể loại</Text>
+            <Text style={styles.sectionTitle}>{t('categoriesTitle')}</Text>
             <TouchableOpacity>
-              <Text style={styles.viewAll}>Xem thêm</Text>
+              <Text style={styles.viewAll}>{t('loadMore')}</Text>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -113,7 +116,7 @@ export default function HomeScreen() {
         {/* Hot stories */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🔥 Đang Hot</Text>
+            <Text style={styles.sectionTitle}>🔥 {t('hotLabel')}</Text>
           </View>
           <FlatList
             horizontal
@@ -134,7 +137,7 @@ export default function HomeScreen() {
         {/* Recently updated */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🆕 Mới Cập Nhật</Text>
+            <Text style={styles.sectionTitle}>🆕 {t('recentlyUpdated')}</Text>
           </View>
           <FlatList
             horizontal
@@ -155,7 +158,7 @@ export default function HomeScreen() {
         {/* Grid suggestions */}
         <View style={[styles.section, { paddingBottom: 16 }]}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>✨ Gợi Ý Cho Bạn</Text>
+            <Text style={styles.sectionTitle}>✨ {t('suggestionsLabel')}</Text>
           </View>
           <View style={styles.grid}>
             {suggestions.map((story) => (

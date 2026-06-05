@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { mockStories, formatDate, formatNumber } from '@story-reader/shared';
+import { mockStories, formatDate, formatNumber, translate, type TranslationKey } from '@story-reader/shared';
 import { useStore } from '../store/useStore';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -15,16 +15,19 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 type Tab = 'reading' | 'completed' | 'favorites';
 const { width: W } = Dimensions.get('window');
 
-const TABS: { id: Tab; label: string; icon: string; activeIcon: string }[] = [
-  { id: 'reading',   label: 'Đang đọc',  icon: 'book-outline',        activeIcon: 'book' },
-  { id: 'completed', label: 'Đã đọc',    icon: 'checkmark-circle-outline', activeIcon: 'checkmark-circle' },
-  { id: 'favorites', label: 'Yêu thích', icon: 'heart-outline',        activeIcon: 'heart' },
-];
+// TABS will be created inside the component so translations are available
 
 export default function LibraryScreen() {
   const navigation = useNavigation<Nav>();
   const [activeTab, setActiveTab] = useState<Tab>('reading');
-  const { bookmarks, shelf, removeBookmark, removeFromShelf, updateShelfStatus, getProgress } = useStore();
+  const { bookmarks, shelf, removeBookmark, removeFromShelf, updateShelfStatus, getProgress, readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
+
+  const TABS: { id: Tab; label: string; icon: string; activeIcon: string; emptyIcon?: string; emptyMsg?: string; emptyDesc?: string }[] = [
+    { id: 'reading', label: t('reading'), icon: 'book-outline', activeIcon: 'book', emptyIcon: '📖', emptyMsg: t('emptyReadingMsg'), emptyDesc: t('emptyReadingDesc') },
+    { id: 'completed', label: t('completed'), icon: 'checkmark-circle-outline', activeIcon: 'checkmark-circle', emptyIcon: '✅', emptyMsg: t('emptyCompletedMsg'), emptyDesc: t('emptyCompletedDesc') },
+    { id: 'favorites', label: t('favorites'), icon: 'heart-outline', activeIcon: 'heart', emptyIcon: '❤️', emptyMsg: t('emptyFavoritesMsg'), emptyDesc: t('emptyFavoritesDesc') },
+  ];
 
   const readingEntries = shelf
     .filter((e) => e.status === 'reading')
@@ -41,7 +44,7 @@ export default function LibraryScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Tủ Truyện</Text>
+        <Text style={styles.headerTitle}>{t('libraryTitle')}</Text>
       </View>
 
       {/* Tabs */}
@@ -66,7 +69,7 @@ export default function LibraryScreen() {
       {/* Đang đọc */}
       {activeTab === 'reading' && (
         readingEntries.length === 0
-          ? <EmptyState icon="book-outline" msg="Chưa có truyện đang đọc" desc="Mở một truyện và bắt đầu đọc" />
+          ? <EmptyState icon="book-outline" msg={TABS[0].emptyMsg!} desc={TABS[0].emptyDesc!} />
           : <FlatList
               data={readingEntries}
               keyExtractor={(e) => e.storyId}
@@ -87,11 +90,11 @@ export default function LibraryScreen() {
                         {progress ? (
                           <View style={styles.chapterRow}>
                             <Ionicons name="book-outline" size={12} color="#ef4444" />
-                            <Text style={styles.chapterText}>Chương {progress.chapterNumber}</Text>
-                            <Text style={styles.chapterTotal}>/ {formatNumber(story.totalChapters)}</Text>
+                            <Text style={styles.chapterText}>{t('chapter')} {progress.chapterNumber}</Text>
+                            <Text style={styles.chapterTotal}>/ {formatNumber(story.totalChapters)} {t('chaptersLabel')}</Text>
                           </View>
                         ) : (
-                          <Text style={styles.noProgress}>Chưa bắt đầu</Text>
+                          <Text style={styles.noProgress}>{t('notStarted')}</Text>
                         )}
                         <View style={styles.progressSection}>
                           <View style={styles.progressRow}>
@@ -111,7 +114,7 @@ export default function LibraryScreen() {
                         style={styles.actionBtn}
                       >
                         <Ionicons name="book-outline" size={14} color="#ef4444" />
-                        <Text style={styles.actionBtnText}>{progress ? 'Đọc tiếp' : 'Bắt đầu'}</Text>
+                        <Text style={styles.actionBtnText}>{progress ? t('continueReading') : t('startReading')}</Text>
                       </TouchableOpacity>
                       <View style={styles.actionDivider} />
                       <TouchableOpacity
@@ -119,7 +122,7 @@ export default function LibraryScreen() {
                         style={styles.actionBtn}
                       >
                         <Ionicons name="checkmark-circle-outline" size={14} color="#22c55e" />
-                        <Text style={[styles.actionBtnText, { color: '#22c55e' }]}>Đánh dấu xong</Text>
+                        <Text style={[styles.actionBtnText, { color: '#22c55e' }]}>{t('markCompleted')}</Text>
                       </TouchableOpacity>
                       <View style={styles.actionDivider} />
                       <TouchableOpacity
@@ -138,7 +141,7 @@ export default function LibraryScreen() {
       {/* Đã đọc */}
       {activeTab === 'completed' && (
         completedEntries.length === 0
-          ? <EmptyState icon="checkmark-circle-outline" msg="Chưa có truyện hoàn thành" desc="Đánh dấu truyện đọc xong để lưu vào đây" />
+          ? <EmptyState icon="checkmark-circle-outline" msg={TABS[1].emptyMsg!} desc={TABS[1].emptyDesc!} />
           : <FlatList
               data={completedEntries}
               keyExtractor={(e) => e.storyId}
@@ -161,22 +164,22 @@ export default function LibraryScreen() {
                     <View style={styles.completedInfo}>
                       <Text style={styles.readingTitle} numberOfLines={1}>{story.title}</Text>
                       <Text style={styles.readingAuthor}>{story.author}</Text>
-                      <Text style={styles.chapterTotal}>{formatNumber(story.totalChapters)} chương</Text>
+                      <Text style={styles.chapterTotal}>{formatNumber(story.totalChapters)} {t('chaptersLabel')}</Text>
                       {entry.completedAt && (
-                        <Text style={styles.dateText}>Xong {formatDate(entry.completedAt)}</Text>
+                          <Text style={styles.dateText}>{t('doneAt')} {formatDate(entry.completedAt)}</Text>
                       )}
                       <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
                         <TouchableOpacity
                           onPress={() => updateShelfStatus(story.id, 'reading')}
                           style={styles.miniBtn}
                         >
-                          <Text style={[styles.miniBtnText, { color: '#3b82f6' }]}>Đọc lại</Text>
+                          <Text style={[styles.miniBtnText, { color: '#3b82f6' }]}>{t('readAgain')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           onPress={() => removeFromShelf(story.id)}
                           style={styles.miniBtn}
                         >
-                          <Text style={styles.miniBtnText}>Xóa</Text>
+                          <Text style={styles.miniBtnText}>{t('delete')}</Text>
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -189,7 +192,7 @@ export default function LibraryScreen() {
       {/* Yêu thích */}
       {activeTab === 'favorites' && (
         favoriteStories.length === 0
-          ? <EmptyState icon="heart-outline" msg="Chưa có truyện yêu thích" desc="Nhấn ❤️ trên trang truyện để thêm" />
+          ? <EmptyState icon="heart-outline" msg={TABS[2].emptyMsg!} desc={TABS[2].emptyDesc!} />
           : <FlatList
               data={favoriteStories}
               keyExtractor={(s) => s.id}

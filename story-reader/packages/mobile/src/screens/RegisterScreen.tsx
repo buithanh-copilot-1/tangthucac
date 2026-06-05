@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useStore } from '../store/useStore';
+import { translate, type TranslationKey } from '@story-reader/shared';
 import { useGoogleAuth } from '../hooks/useGoogleAuth';
 import type { AuthStackParamList } from '../navigation/AppNavigator';
 
@@ -15,23 +16,26 @@ type Nav = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
 
 interface FieldErrors { username?: string; email?: string; password?: string; confirm?: string }
 
-function validate(u: string, e: string, p: string, c: string): FieldErrors {
-  const errs: FieldErrors = {};
-  if (!u.trim()) errs.username = 'Vui lòng nhập tên người dùng';
-  else if (u.trim().length < 3) errs.username = 'Tên ít nhất 3 ký tự';
-  else if (!/^[a-zA-Z0-9_]+$/.test(u.trim())) errs.username = 'Chỉ dùng chữ, số và _';
-  if (!e.trim()) errs.email = 'Vui lòng nhập email';
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim())) errs.email = 'Email không hợp lệ';
-  if (!p) errs.password = 'Vui lòng nhập mật khẩu';
-  else if (p.length < 6) errs.password = 'Ít nhất 6 ký tự';
-  if (!c) errs.confirm = 'Vui lòng xác nhận mật khẩu';
-  else if (p !== c) errs.confirm = 'Mật khẩu không khớp';
-  return errs;
-}
+// validation will be done inside the component so we can use translations
 
 export default function RegisterScreen() {
   const navigation = useNavigation<Nav>();
-  const { register } = useStore();
+  const { register, readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
+
+  function validate(u: string, e: string, p: string, c: string): FieldErrors {
+    const errs: FieldErrors = {};
+    if (!u.trim()) errs.username = t('usernameRequired');
+    else if (u.trim().length < 3) errs.username = t('usernameTooShort');
+    else if (!/^[a-zA-Z0-9_]+$/.test(u.trim())) errs.username = t('usernameInvalid');
+    if (!e.trim()) errs.email = t('emailRequired');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim())) errs.email = t('emailInvalid');
+    if (!p) errs.password = t('passwordRequired');
+    else if (p.length < 6) errs.password = t('passwordTooShort');
+    if (!c) errs.confirm = t('confirmRequired');
+    else if (p !== c) errs.confirm = t('passwordConfirmMismatch');
+    return errs;
+  }
 
   const [form, setForm] = useState({ username: '', email: '', password: '', confirm: '' });
   const [showPass, setShowPass] = useState(false);
@@ -72,8 +76,8 @@ export default function RegisterScreen() {
             <View style={styles.logoBox}>
               <Ionicons name="person-add-outline" size={34} color="#fff" />
             </View>
-            <Text style={styles.heroTitle}>Tạo tài khoản</Text>
-            <Text style={styles.heroSub}>Đăng ký để lưu tiến độ đọc của bạn</Text>
+            <Text style={styles.heroTitle}>{t('registerNewAccount')}</Text>
+            <Text style={styles.heroSub}>{t('registerPrompt')}</Text>
           </View>
 
           <View style={styles.card}>
@@ -86,12 +90,12 @@ export default function RegisterScreen() {
               {googleAuth.loading ? (
                 <>
                   <ActivityIndicator size="small" color="#4285F4" />
-                  <Text style={styles.googleBtnText}>Đang xử lý...</Text>
+                  <Text style={styles.googleBtnText}>{t('processing')}</Text>
                 </>
               ) : (
                 <>
                   <Text style={[styles.googleG, { color: '#4285F4' }]}>G</Text>
-                  <Text style={styles.googleBtnText}>Đăng ký bằng Google</Text>
+                  <Text style={styles.googleBtnText}>{t('continueWithGoogle')}</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -104,7 +108,7 @@ export default function RegisterScreen() {
 
             <View style={styles.orRow}>
               <View style={styles.orLine} />
-              <Text style={styles.orText}>hoặc đăng ký bằng email</Text>
+              <Text style={styles.orText}>{t('or')} {t('register')}</Text>
               <View style={styles.orLine} />
             </View>
 

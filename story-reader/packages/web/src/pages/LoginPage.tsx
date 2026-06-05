@@ -167,7 +167,7 @@ export default function LoginPage() {
                   </svg>
                   {t('processing')}
                 </span>
-              ) : 'Đăng nhập'}
+              ) : t('login')}
             </button>
           </form>
 

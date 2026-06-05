@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { useStore } from '../store/useStore';
+import { translate, type TranslationKey } from '@story-reader/shared';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -10,7 +11,8 @@ const IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ?? '';
 const ANDROID_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID ?? '';
 
 export function useGoogleAuth(onSuccess: () => void) {
-  const { loginWithGoogle } = useStore();
+  const { loginWithGoogle, readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -32,9 +34,9 @@ export function useGoogleAuth(onSuccess: () => void) {
         // Gửi Google access token thẳng lên backend
         const result = await loginWithGoogle(authentication.accessToken);
         if (result.success) onSuccess();
-        else setError(result.error ?? 'Đăng nhập Google thất bại');
+        else setError(result.error ?? t('googleLoginFailed'));
       } catch {
-        setError('Không kết nối được server. Vui lòng thử lại.');
+        setError(t('networkError'));
       } finally {
         setLoading(false);
       }

@@ -1,4 +1,5 @@
 import { useStore } from '../store/useStore';
+import { translate } from '@story-reader/shared';
 
 const BASE = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000/api';
 
@@ -41,7 +42,7 @@ async function request<T = unknown>(
       }
     }
     clearAuth();
-    throw new ApiError(401, 'Phiên đăng nhập đã hết hạn');
+    throw new ApiError(401, translate(useStore.getState().readerSettings.language, 'sessionExpired'));
   }
 
   if (!res.ok) {

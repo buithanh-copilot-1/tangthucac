@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import { useToast } from '../../store/useToast';
 import { ratingApi } from '../../services/engagement.api';
+import { translate } from '@story-reader/shared';
 
 interface Props {
   storyId: string;
@@ -28,7 +29,8 @@ export default function RatingStars({ storyId, onRated }: Props) {
 
   const handleRate = async (score: number) => {
     if (!currentUser) {
-      toast.info('Đăng nhập để đánh giá truyện');
+      const lang = useStore.getState().readerSettings.language;
+      toast.info(translate(lang, 'loginToRate'));
       navigate('/login', { state: { from: `/story/${storyId}` } });
       return;
     }
@@ -38,10 +40,12 @@ export default function RatingStars({ storyId, onRated }: Props) {
     try {
       const res = await ratingApi.rate(storyId, score);
       onRated?.(res.rating, res.ratingCount);
-      toast.success(`Đã đánh giá ${score} sao!`);
+      const lang = useStore.getState().readerSettings.language;
+      toast.success(translate(lang, 'ratingSuccess').replace('{score}', String(score)));
     } catch {
       setMyScore(prev);
-      toast.error('Đánh giá thất bại, thử lại sau');
+      const lang = useStore.getState().readerSettings.language;
+      toast.error(translate(lang, 'ratingFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -71,7 +75,9 @@ export default function RatingStars({ storyId, onRated }: Props) {
         })}
       </div>
       <span className="text-xs text-gray-500">
-        {myScore > 0 ? `Bạn: ${myScore}★` : 'Chạm để đánh giá'}
+        {myScore > 0
+          ? translate(useStore.getState().readerSettings.language, 'yourRating').replace('{score}', String(myScore))
+          : translate(useStore.getState().readerSettings.language, 'tapToRate')}
       </span>
     </div>
   );

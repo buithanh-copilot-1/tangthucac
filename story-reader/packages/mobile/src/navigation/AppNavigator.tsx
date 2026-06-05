@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useStore } from '../store/useStore';
+import { translate, type TranslationKey } from '@story-reader/shared';
 
 import HomeScreen from '../screens/HomeScreen';
 import BrowseScreen from '../screens/BrowseScreen';
@@ -48,6 +49,8 @@ function AuthNavigator() {
 }
 
 function TabNavigator() {
+  const readerSettings = useStore((s) => s.readerSettings);
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -74,10 +77,10 @@ function TabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Trang chủ' }} />
-      <Tab.Screen name="Browse" component={BrowseScreen} options={{ tabBarLabel: 'Khám phá' }} />
-      <Tab.Screen name="Library" component={LibraryScreen} options={{ tabBarLabel: 'Thư viện' }} />
-      <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Cài đặt' }} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: t('home') }} />
+      <Tab.Screen name="Browse" component={BrowseScreen} options={{ tabBarLabel: t('browse') }} />
+      <Tab.Screen name="Library" component={LibraryScreen} options={{ tabBarLabel: t('library') }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: t('settings') }} />
     </Tab.Navigator>
   );
 }

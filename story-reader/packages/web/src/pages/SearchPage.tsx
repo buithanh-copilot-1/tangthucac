@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Clock, TrendingUp } from 'lucide-react';
-import { categories } from '@story-reader/shared';
+import { categories, translate, type TranslationKey } from '@story-reader/shared';
 import type { Genre, Story } from '@story-reader/shared';
 import { useStore } from '../store/useStore';
 import Layout from '../components/layout/Layout';
@@ -13,9 +13,12 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 const hotSearches = ['Tiên hiệp', 'Đấu phá', 'Kim Dung', 'Ngôn tình', 'Trọng sinh', 'Tam Thể'];
 
 export default function SearchPage() {
+  const { readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
+
   useDocumentMeta({
-    title: 'Tim kiem',
-    description: 'Tim truyen theo ten, tac gia va the loai tren TruyenHay.',
+    title: t('searchTitle'),
+    description: t('searchDescription'),
   });
 
   const navigate = useNavigate();
@@ -86,7 +89,7 @@ export default function SearchPage() {
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Tìm truyện, tác giả..."
+              placeholder={t('searchPlaceholder')}
               className="flex-1 bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
             />
             {query && (
@@ -96,7 +99,7 @@ export default function SearchPage() {
             )}
           </div>
           <button type="submit" className="text-primary-500 text-sm font-semibold flex-shrink-0">
-            Tìm
+            {t('searchLabel')}
           </button>
         </form>
         {suggestions.length > 0 && !loading && (
@@ -126,9 +129,9 @@ export default function SearchPage() {
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                  <Clock size={14} className="text-gray-400" /> Tìm kiếm gần đây
+                  <Clock size={14} className="text-gray-400" /> {t('recentSearchesLabel')}
                 </p>
-                <button onClick={clearRecentSearches} className="text-xs text-primary-500">Xóa</button>
+                <button onClick={clearRecentSearches} className="text-xs text-primary-500">{t('delete')}</button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {recentSearches.map((q) => (
@@ -143,7 +146,7 @@ export default function SearchPage() {
 
           <div className="mb-6">
             <p className="text-sm font-semibold text-gray-900 flex items-center gap-2 mb-3">
-              <TrendingUp size={14} className="text-primary-500" /> Tìm kiếm nổi bật
+              <TrendingUp size={14} className="text-primary-500" /> {t('hotSearchesLabel')}
             </p>
             <div className="flex flex-wrap gap-2">
               {hotSearches.map((q, i) => (
@@ -157,7 +160,7 @@ export default function SearchPage() {
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-900 mb-3">Theo thể loại</p>
+            <p className="text-sm font-semibold text-gray-900 mb-3">{t('byGenre')}</p>
             <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-4 xl:grid-cols-6 gap-2">
               {categories.map((cat) => (
                 <button key={cat.id} onClick={() => setActiveGenre(cat.id)}
@@ -188,8 +191,8 @@ export default function SearchPage() {
             <StoryListSkeleton count={5} />
           ) : (
             <>
-              <p className="text-xs text-gray-500 mb-3">
-                {results.length} kết quả {query ? `cho "${query}"` : ''}
+                <p className="text-xs text-gray-500 mb-3">
+                {results.length} {t('resultsLabel')} {query ? `cho "${query}"` : ''}
               </p>
               {results.length > 0 ? (
                 <div className="flex flex-col gap-2 max-w-3xl">
@@ -200,8 +203,8 @@ export default function SearchPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-16 text-gray-400">
                   <span className="text-5xl mb-4">🔍</span>
-                  <p className="text-sm">Không tìm thấy kết quả</p>
-                  <p className="text-xs mt-1">Thử từ khóa khác</p>
+                  <p className="text-sm">{t('noResultsFound')}</p>
+                  <p className="text-xs mt-1">{t('tryDifferentQuery')}</p>
                 </div>
               )}
             </>

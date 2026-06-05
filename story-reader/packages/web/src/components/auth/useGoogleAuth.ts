@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useStore } from '../../store/useStore';
+import { translate } from '@story-reader/shared';
 
 export function useGoogleAuth(onSuccess: () => void) {
   const { loginWithGoogle } = useStore();
@@ -17,17 +18,20 @@ export function useGoogleAuth(onSuccess: () => void) {
         if (result.success) {
           onSuccess();
         } else {
-          setError(result.error ?? 'Đăng nhập Google thất bại');
+          const lang = useStore.getState().readerSettings.language;
+          setError(result.error ?? translate(lang, 'googleLoginFailed'));
         }
       } catch {
-        setError('Không kết nối được server. Vui lòng thử lại.');
+        const lang = useStore.getState().readerSettings.language;
+        setError(translate(lang, 'networkError'));
       } finally {
         setLoading(false);
       }
     },
     onError: (err) => {
       if (err.error !== 'access_denied') {
-        setError('Đăng nhập Google thất bại. Vui lòng thử lại.');
+        const lang = useStore.getState().readerSettings.language;
+        setError(translate(lang, 'googleLoginFailed'));
       }
     },
   });

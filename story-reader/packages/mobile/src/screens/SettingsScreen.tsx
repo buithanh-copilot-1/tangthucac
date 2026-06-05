@@ -26,11 +26,11 @@ export default function SettingsScreen() {
   const handleSaveName = () => {
     const trimmed = nameInput.trim();
     if (!trimmed || trimmed.length < 3) {
-      Alert.alert('Lỗi', 'Tên phải ít nhất 3 ký tự');
+      Alert.alert(t('errorTitle'), t('usernameTooShort'));
       return;
     }
     if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
-      Alert.alert('Lỗi', 'Tên chỉ dùng chữ, số và _');
+      Alert.alert(t('errorTitle'), t('usernameInvalid'));
       return;
     }
     updateProfile({ username: trimmed });
@@ -38,16 +38,16 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert('Đăng xuất', 'Bạn có chắc muốn đăng xuất?', [
-      { text: 'Hủy', style: 'cancel' },
-      { text: 'Đăng xuất', style: 'destructive', onPress: () => logout() },
+    Alert.alert(t('confirmLogoutTitle'), t('confirmLogoutMessage'), [
+      { text: t('cancel'), style: 'cancel' },
+      { text: t('logout'), style: 'destructive', onPress: () => logout() },
     ]);
   };
 
   const handleClearAll = () => {
-    Alert.alert('Xóa dữ liệu', 'Bạn có chắc muốn xóa tất cả dữ liệu?', [
-      { text: 'Hủy', style: 'cancel' },
-      { text: 'Xóa', style: 'destructive', onPress: () => { clearHistory(); clearRecentSearches(); } },
+    Alert.alert(t('confirmDeleteDataTitle'), t('confirmDeleteDataMessage'), [
+      { text: t('cancel'), style: 'cancel' },
+      { text: t('delete'), style: 'destructive', onPress: () => { clearHistory(); clearRecentSearches(); } },
     ]);
   };
 
@@ -63,7 +63,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Cài Đặt</Text>
+        <Text style={styles.headerTitle}>{t('settingsTitle')}</Text>
       </View>
 
       <View style={{ flex: 1 }}>
@@ -121,35 +121,35 @@ export default function SettingsScreen() {
                   <Text style={styles.email} numberOfLines={1}>{currentUser.email}</Text>
                   {currentUser.provider === 'google' ? (
                     <View style={styles.googleBadge}>
-                      <Text style={styles.googleBadgeText}>G  Google Account</Text>
+                      <Text style={styles.googleBadgeText}>G  {t('googleInfo')}</Text>
                     </View>
                   ) : (
                     <View style={styles.emailBadge}>
-                      <Text style={styles.emailBadgeText}>📧  Email</Text>
+                      <Text style={styles.emailBadgeText}>📧  {t('email')}</Text>
                     </View>
                   )}
-                  <Text style={styles.joined}>Tham gia {joinedDate}</Text>
+                  <Text style={styles.joined}>{t('joined')} {joinedDate}</Text>
                 </View>
               </View>
 
               {/* Google profile detail */}
-              {currentUser.provider === 'google' && (
+                  {currentUser.provider === 'google' && (
                 <View style={styles.googleCard}>
                   <View style={styles.googleCardHeader}>
-                    <Text style={styles.googleCardHeaderText}>G  Thông tin Google Account</Text>
+                    <Text style={styles.googleCardHeaderText}>G  {t('googleInfo')}</Text>
                     {currentUser.emailVerified && (
                       <View style={styles.verifiedBadge}>
                         <Ionicons name="checkmark-circle" size={10} color="#22c55e" />
-                        <Text style={styles.verifiedText}>Đã xác minh</Text>
+                        <Text style={styles.verifiedText}>{t('verified')}</Text>
                       </View>
                     )}
                   </View>
                   {[
-                    { label: 'Họ và tên', value: currentUser.displayName },
-                    { label: 'Họ',        value: currentUser.familyName },
-                    { label: 'Tên',       value: currentUser.givenName },
-                    { label: 'Email',     value: currentUser.email },
-                    { label: 'Google ID', value: currentUser.googleId },
+                    { label: t('fullName'), value: currentUser.displayName },
+                    { label: t('familyName'),        value: currentUser.familyName },
+                    { label: t('givenName'),       value: currentUser.givenName },
+                    { label: t('email'),     value: currentUser.email },
+                    { label: t('googleId'), value: currentUser.googleId },
                   ].filter(r => r.value).map(({ label, value }, i, arr) => (
                     <View key={label} style={[styles.googleRow, i < arr.length - 1 && styles.googleRowBorder]}>
                       <Text style={styles.googleRowLabel}>{label}</Text>
@@ -162,9 +162,9 @@ export default function SettingsScreen() {
               {/* Stats */}
               <View style={styles.statsRow}>
                 {[
-                  { label: 'Yêu thích', value: bookmarks.length, color: '#ef4444' },
-                  { label: 'Đang đọc', value: shelf.filter((e) => e.status === 'reading').length, color: '#3b82f6' },
-                  { label: 'Đã đọc', value: shelf.filter((e) => e.status === 'completed').length, color: '#22c55e' },
+                  { label: t('favorites'), value: bookmarks.length, color: '#ef4444' },
+                  { label: t('reading'), value: shelf.filter((e) => e.status === 'reading').length, color: '#3b82f6' },
+                  { label: t('completed'), value: shelf.filter((e) => e.status === 'completed').length, color: '#22c55e' },
                 ].map(({ label, value, color }, i, arr) => (
                   <View key={label} style={[styles.statItem, i < arr.length - 1 && styles.statBorder]}>
                     <Text style={[styles.statNum, { color }]}>{value}</Text>
@@ -176,32 +176,32 @@ export default function SettingsScreen() {
               {/* Logout */}
               <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
                 <Ionicons name="log-out-outline" size={17} color="#ef4444" />
-                <Text style={styles.logoutText}>Đăng xuất</Text>
+                <Text style={styles.logoutText}>{t('logout')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.loginCta}>
-              <Text style={styles.ctaTitle}>Chưa đăng nhập</Text>
-              <Text style={styles.ctaDesc}>Đăng nhập để lưu tủ truyện và đồng bộ tiến độ đọc.</Text>
+                <Text style={styles.ctaTitle}>{t('notLoggedIn')}</Text>
+                <Text style={styles.ctaDesc}>{t('loginPrompt')}</Text>
               <View style={styles.ctaBtns}>
                 <TouchableOpacity
                   onPress={() => (navigation as any).navigate('Auth')}
                   style={styles.ctaLoginBtn}
                 >
-                  <Text style={styles.ctaLoginText}>Đăng nhập</Text>
+                    <Text style={styles.ctaLoginText}>{t('login')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => (navigation as any).navigate('Auth')}
                   style={styles.ctaRegisterBtn}
                 >
-                  <Text style={styles.ctaRegisterText}>Đăng ký</Text>
+                    <Text style={styles.ctaRegisterText}>{t('register')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
           )}
 
           {/* Reading settings */}
-          <Text style={styles.sectionLabel}>CÀI ĐẶT ĐỌC TRUYỆN</Text>
+          <Text style={styles.sectionLabel}>{t('readerSettings')}</Text>
           <View style={styles.card}>
             {/* Font size */}
             <View style={styles.row}>
@@ -209,7 +209,7 @@ export default function SettingsScreen() {
                 <View style={[styles.iconBox, { backgroundColor: '#eff6ff' }]}>
                   <Ionicons name="text" size={18} color="#3b82f6" />
                 </View>
-                <Text style={styles.rowLabel}>Cỡ chữ</Text>
+                <Text style={styles.rowLabel}>{t('fontSize')}</Text>
               </View>
               <View style={styles.segmented}>
                 {(['sm', 'md', 'lg', 'xl'] as const).map((fs) => (
@@ -234,7 +234,7 @@ export default function SettingsScreen() {
                 <View style={[styles.iconBox, { backgroundColor: '#fefce8' }]}>
                   <Ionicons name={readerSettings.theme === 'dark' ? 'moon' : 'sunny'} size={18} color="#eab308" />
                 </View>
-                <Text style={styles.rowLabel}>Nền đọc</Text>
+                <Text style={styles.rowLabel}>{t('background')}</Text>
               </View>
               <View style={styles.segmented}>
                 {readerThemes.map((theme) => (
@@ -251,14 +251,14 @@ export default function SettingsScreen() {
           </View>
 
           {/* Data */}
-          <Text style={styles.sectionLabel}>DỮ LIỆU</Text>
+          <Text style={styles.sectionLabel}>{t('data')}</Text>
           <View style={styles.card}>
             <TouchableOpacity onPress={clearHistory} style={styles.menuItem}>
               <View style={styles.rowLeft}>
                 <View style={[styles.iconBox, { backgroundColor: '#fff7ed' }]}>
                   <Ionicons name="time-outline" size={18} color="#f97316" />
                 </View>
-                <Text style={styles.rowLabel}>Xóa lịch sử đọc</Text>
+                <Text style={styles.rowLabel}>{t('clearReadingHistory')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={16} color="#cbd5e1" />
             </TouchableOpacity>
@@ -268,14 +268,14 @@ export default function SettingsScreen() {
                 <View style={[styles.iconBox, { backgroundColor: '#fff1f2' }]}>
                   <Ionicons name="trash-outline" size={18} color="#ef4444" />
                 </View>
-                <Text style={[styles.rowLabel, { color: '#ef4444' }]}>Xóa tất cả dữ liệu</Text>
+                <Text style={[styles.rowLabel, { color: '#ef4444' }]}>{t('clearAllData')}</Text>
               </View>
               <Ionicons name="chevron-forward" size={16} color="#cbd5e1" />
             </TouchableOpacity>
           </View>
 
           {/* About */}
-          <Text style={styles.sectionLabel}>KHÁC</Text>
+          <Text style={styles.sectionLabel}>{t('other')}</Text>
           <View style={styles.card}>
             <View style={styles.menuItem}>
               <View style={styles.rowLeft}>

@@ -256,12 +256,12 @@ export default function RegisterPage() {
           {/* Login link */}
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-gray-100" />
-            <span className="text-xs text-gray-400">hoặc</span>
+            <span className="text-xs text-gray-400">{t('or')}</span>
             <div className="flex-1 h-px bg-gray-100" />
           </div>
 
           <p className="text-center text-sm text-gray-500">
-            Đã có tài khoản?{' '}
+            {t('haveAccount')}{' '}
             <Link to="/login" state={{ from }} className="text-primary-500 font-semibold">
               {t('login')}
             </Link>

@@ -7,16 +7,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { mockStories, categories, getChapters, formatNumber, formatDate, statusLabel } from '@story-reader/shared';
+import { mockStories, categories, getChapters, formatNumber, formatDate, statusLabel, translate, type TranslationKey } from '@story-reader/shared';
 import type { ShelfStatus } from '@story-reader/shared';
 import { useStore } from '../store/useStore';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
-const SHELF_OPTIONS: { status: ShelfStatus; label: string; icon: string; color: string }[] = [
-  { status: 'reading',      label: 'Đang đọc',  icon: 'book-outline',             color: '#3b82f6' },
-  { status: 'completed',    label: 'Đã đọc',    icon: 'checkmark-circle-outline', color: '#22c55e' },
-  { status: 'want_to_read', label: 'Muốn đọc',  icon: 'bookmark-outline',         color: '#8b5cf6' },
-];
+// SHELF_OPTIONS will be constructed inside the component to use translations
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type Route = RouteProp<RootStackParamList, 'StoryDetail'>;
@@ -25,7 +21,14 @@ export default function StoryDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { id } = route.params;
-  const { isBookmarked, addBookmark, removeBookmark, getProgress, getShelfEntry, addToShelf, updateShelfStatus, removeFromShelf } = useStore();
+  const { isBookmarked, addBookmark, removeBookmark, getProgress, getShelfEntry, addToShelf, updateShelfStatus, removeFromShelf, readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
+
+  const SHELF_OPTIONS: { status: ShelfStatus; label: string; icon: string; color: string }[] = [
+    { status: 'reading',      label: t('reading'),  icon: 'book-outline',             color: '#3b82f6' },
+    { status: 'completed',    label: t('completed'),    icon: 'checkmark-circle-outline', color: '#22c55e' },
+    { status: 'want_to_read', label: t('wantToRead'),  icon: 'bookmark-outline',         color: '#8b5cf6' },
+  ];
   const [descExpanded, setDescExpanded] = useState(false);
   const [showShelfModal, setShowShelfModal] = useState(false);
 
@@ -102,7 +105,7 @@ export default function StoryDetailScreen() {
                 <Ionicons name="star" size={14} color="#facc15" />
                 <Text style={styles.statNum}>{story.rating.toFixed(1)}</Text>
               </View>
-              <Text style={styles.statLabel}>{formatNumber(story.ratingCount)} đánh giá</Text>
+              <Text style={styles.statLabel}>{formatNumber(story.ratingCount)} {t('ratingsLabel')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
@@ -110,7 +113,7 @@ export default function StoryDetailScreen() {
                 <Ionicons name="book-outline" size={14} color="#3b82f6" />
                 <Text style={styles.statNum}>{formatNumber(story.totalChapters)}</Text>
               </View>
-              <Text style={styles.statLabel}>Chương</Text>
+              <Text style={styles.statLabel}>{t('chaptersLabel')}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
@@ -118,7 +121,7 @@ export default function StoryDetailScreen() {
                 <Ionicons name="eye-outline" size={14} color="#10b981" />
                 <Text style={styles.statNum}>{formatNumber(story.views)}</Text>
               </View>
-              <Text style={styles.statLabel}>Lượt đọc</Text>
+              <Text style={styles.statLabel}>{t('viewsLabel')}</Text>
             </View>
           </View>
 
@@ -138,7 +141,7 @@ export default function StoryDetailScreen() {
             </Text>
             <TouchableOpacity onPress={() => setDescExpanded((v) => !v)} style={styles.descToggle}>
               <Ionicons name={descExpanded ? 'chevron-up' : 'chevron-down'} size={14} color="#ef4444" />
-              <Text style={styles.descToggleText}>{descExpanded ? 'Thu gọn' : 'Xem thêm'}</Text>
+              <Text style={styles.descToggleText}>{descExpanded ? t('showLess') : t('showMore')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -146,9 +149,9 @@ export default function StoryDetailScreen() {
           {progress && (
             <View style={styles.progressCard}>
               <View style={styles.progressHeader}>
-                <Text style={styles.progressLabel}>Tiến độ đọc</Text>
-                <Text style={styles.progressValue}>C.{progress.chapterNumber}/{formatNumber(story.totalChapters)} · {readPct}%</Text>
-              </View>
+                  <Text style={styles.progressLabel}>{t('readingProgress')}</Text>
+                  <Text style={styles.progressValue}>C.{progress.chapterNumber}/{formatNumber(story.totalChapters)} · {readPct}%</Text>
+                </View>
               <View style={styles.progressBg}>
                 <View style={[styles.progressFill, { width: `${readPct}%` as any }]} />
               </View>
@@ -160,7 +163,7 @@ export default function StoryDetailScreen() {
             <TouchableOpacity onPress={startReading} style={styles.readBtn}>
               <Ionicons name="book-outline" size={17} color="#fff" />
               <Text style={styles.readBtnText}>
-                {progress ? `Đọc tiếp C.${progress.chapterNumber}` : 'Đọc từ đầu'}
+                {progress ? `${t('continueReading')} C.${progress.chapterNumber}` : t('startReading')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -172,7 +175,7 @@ export default function StoryDetailScreen() {
           </View>
 
           {/* Shelf / Tủ truyện */}
-          <TouchableOpacity onPress={() => setShowShelfModal(true)} style={styles.shelfBtn}>
+            <TouchableOpacity onPress={() => setShowShelfModal(true)} style={styles.shelfBtn}>
             <View style={[styles.shelfIcon, { backgroundColor: currentShelfOpt ? `${currentShelfOpt.color}20` : '#f1f5f9' }]}>
               <Ionicons
                 name={(currentShelfOpt?.icon ?? 'add-outline') as any}
@@ -182,10 +185,10 @@ export default function StoryDetailScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.shelfBtnTitle}>
-                {currentShelfOpt ? currentShelfOpt.label : 'Thêm vào tủ truyện'}
+                {currentShelfOpt ? currentShelfOpt.label : t('addToShelfLabel')}
               </Text>
               <Text style={styles.shelfBtnDesc}>
-                {currentShelfOpt ? 'Nhấn để thay đổi' : 'Đang đọc · Đã đọc · Muốn đọc'}
+                {currentShelfOpt ? t('pressToChange') : `${t('reading')} · ${t('completed')} · ${t('wantToRead')}`}
               </Text>
             </View>
             <Ionicons name="chevron-down" size={16} color="#94a3b8" />
@@ -193,7 +196,7 @@ export default function StoryDetailScreen() {
 
           {/* Chapter list */}
           <View style={styles.chapterSection}>
-            <Text style={styles.chapterTitle}>Danh sách chương ({chapters.length})</Text>
+            <Text style={styles.chapterTitle}>{t('chapterListTitle')} ({chapters.length})</Text>
             {chapters.map((ch) => {
               const isCurrent = progress?.chapterNumber === ch.number;
               return (
@@ -204,11 +207,11 @@ export default function StoryDetailScreen() {
                 >
                   <View style={styles.chapterInfo}>
                     <Text style={[styles.chapterName, isCurrent && styles.chapterNameActive]} numberOfLines={1}>
-                      Chương {ch.number}: {ch.title}
+                      {t('chapter')} {ch.number}: {ch.title}
                     </Text>
                     <Text style={styles.chapterDate}>{formatDate(ch.publishedAt)}</Text>
                   </View>
-                  {isCurrent && <Text style={styles.readingLabel}>Đang đọc</Text>}
+                  {isCurrent && <Text style={styles.readingLabel}>{t('reading')}</Text>}
                 </TouchableOpacity>
               );
             })}
@@ -219,9 +222,9 @@ export default function StoryDetailScreen() {
       {/* Shelf Modal */}
       <Modal visible={showShelfModal} transparent animationType="slide" onRequestClose={() => setShowShelfModal(false)}>
         <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setShowShelfModal(false)} />
-        <View style={styles.modalSheet}>
+          <View style={styles.modalSheet}>
           <View style={styles.modalHandle} />
-          <Text style={styles.modalTitle}>Tủ truyện</Text>
+          <Text style={styles.modalTitle}>{t('libraryTitle')}</Text>
           {SHELF_OPTIONS.map((opt) => {
             const isActive = shelfEntry?.status === opt.status;
             return (
@@ -243,7 +246,7 @@ export default function StoryDetailScreen() {
               <View style={styles.modalDivider} />
               <TouchableOpacity onPress={() => { removeFromShelf(story.id); setShowShelfModal(false); }} style={styles.modalRemove}>
                 <Ionicons name="close-circle-outline" size={18} color="#ef4444" />
-                <Text style={styles.modalRemoveText}>Xóa khỏi tủ truyện</Text>
+                  <Text style={styles.modalRemoveText}>{t('removeFromShelf')}</Text>
               </TouchableOpacity>
             </>
           )}

@@ -116,13 +116,14 @@ function UserAvatar() {
 }
 
 export default function Header({
-  title = 'TruyệnHay',
+  title,
   showSearch = true,
   showBack = false,
 }: HeaderProps) {
   const navigate = useNavigate();
   const { toggleSidebar, readerSettings } = useStore();
   const t = (key: TranslationKey) => translate(readerSettings.language, key);
+  const siteTitle = title ?? t('siteName');
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
@@ -154,14 +155,14 @@ export default function Header({
               <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
                 <span className="text-white text-sm font-bold">T</span>
               </div>
-              <span className="font-bold text-gray-900 text-lg leading-none">TruyệnHay</span>
+              <span className="font-bold text-gray-900 text-lg leading-none">{t('siteName')}</span>
             </Link>
           )}
         </div>
 
         {showBack && (
           <h1 className="absolute left-1/2 -translate-x-1/2 font-semibold text-gray-900 text-base max-w-[200px] truncate">
-            {title}
+            {siteTitle}
           </h1>
         )}
 

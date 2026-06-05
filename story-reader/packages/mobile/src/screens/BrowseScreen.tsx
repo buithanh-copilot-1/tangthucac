@@ -7,7 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { mockStories, categories } from '@story-reader/shared';
+import { mockStories, categories, translate, type TranslationKey } from '@story-reader/shared';
+import { useStore } from '../store/useStore';
 import type { Genre } from '@story-reader/shared';
 import StoryCard from '../components/StoryCard';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -18,6 +19,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function BrowseScreen() {
   const navigation = useNavigation<Nav>();
+  const { readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
   const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
   const [sort, setSort] = useState<SortOption>('hot');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -37,7 +40,7 @@ export default function BrowseScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Khám Phá</Text>
+        <Text style={styles.headerTitle}>{t('browse')}</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Search')} style={styles.iconBtn}>
           <Ionicons name="search" size={22} color="#475569" />
         </TouchableOpacity>
@@ -50,7 +53,7 @@ export default function BrowseScreen() {
             onPress={() => setSelectedGenre(null)}
             style={[styles.genreChip, !selectedGenre && styles.genreChipActive]}
           >
-            <Text style={[styles.genreText, !selectedGenre && styles.genreTextActive]}>Tất cả</Text>
+            <Text style={[styles.genreText, !selectedGenre && styles.genreTextActive]}>{t('allLabel')}</Text>
           </TouchableOpacity>
           {categories.map((cat) => (
             <TouchableOpacity
@@ -69,7 +72,7 @@ export default function BrowseScreen() {
 
       {/* Sort bar */}
       <View style={styles.sortBar}>
-        <Text style={styles.countText}>{filtered.length} truyện</Text>
+        <Text style={styles.countText}>{filtered.length} {t('storiesLabel')}</Text>
         <View style={styles.sortRow}>
           {(['hot', 'recent', 'rating', 'views'] as SortOption[]).map((s) => (
             <TouchableOpacity
@@ -78,7 +81,7 @@ export default function BrowseScreen() {
               style={[styles.sortChip, sort === s && styles.sortChipActive]}
             >
               <Text style={[styles.sortText, sort === s && styles.sortTextActive]}>
-                {s === 'hot' ? 'Hot' : s === 'recent' ? 'Mới' : s === 'rating' ? 'Đánh giá' : 'Lượt đọc'}
+                {s === 'hot' ? t('hotLabel') : s === 'recent' ? t('sortNewest') : s === 'rating' ? t('sortRating') : t('viewsLabel')}
               </Text>
             </TouchableOpacity>
           ))}

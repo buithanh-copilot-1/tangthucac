@@ -1,5 +1,6 @@
 import { useStore } from '../store/useStore';
 import { useToast } from '../store/useToast';
+import { translate } from '@story-reader/shared';
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 
@@ -35,8 +36,10 @@ async function request<T = unknown>(
   try {
     res = await fetch(`${BASE}${path}`, { ...init, headers });
   } catch {
-    const err = new ApiError(0, 'Không kết nối được server. Kiểm tra lại mạng.');
-    if (!silent) useToast.getState().error(err.message, 'Lỗi kết nối');
+    const lang = useStore.getState().readerSettings.language;
+    const msg = translate(lang, 'networkError');
+    const err = new ApiError(0, msg);
+    if (!silent) useToast.getState().error(err.message, translate(lang, 'serverErrorTitle'));
     throw err;
   }
 
@@ -56,8 +59,10 @@ async function request<T = unknown>(
       }
     }
     clearAuth();
-    const err = new ApiError(401, 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-    if (!silent) useToast.getState().warning(err.message, 'Hết phiên');
+    const lang = useStore.getState().readerSettings.language;
+    const msg = translate(lang, 'sessionExpired');
+    const err = new ApiError(401, msg);
+    if (!silent) useToast.getState().warning(err.message, translate(lang, 'sessionExpiredTitle'));
     throw err;
   }
 
@@ -81,7 +86,8 @@ async function request<T = unknown>(
 
     const err = new ApiError(res.status, msg);
     if (!silent && res.status >= 500) {
-      useToast.getState().error(msg, 'Lỗi server');
+      const lang = useStore.getState().readerSettings.language;
+      useToast.getState().error(msg, translate(lang, 'serverErrorTitle'));
     }
     throw err;
   }

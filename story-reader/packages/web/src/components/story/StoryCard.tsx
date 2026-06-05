@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { Star, BookOpen } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { Story } from '@story-reader/shared';
-import { formatNumber, statusLabel, statusColor } from '@story-reader/shared';
+import { formatNumber, statusLabel, statusColor, translate, type TranslationKey } from '@story-reader/shared';
+import { useStore } from '../../store/useStore';
 
 interface StoryCardProps {
   story: Story;
@@ -25,6 +26,8 @@ function highlightText(text: string, query?: string): ReactNode {
 }
 
 export default function StoryCard({ story, variant = 'grid', highlightQuery }: StoryCardProps) {
+  const { readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
   if (variant === 'horizontal') {
     return (
       <Link to={`/story/${story.id}`} className="flex-shrink-0 w-32 story-card-hover block">
@@ -81,7 +84,7 @@ export default function StoryCard({ story, variant = 'grid', highlightQuery }: S
             </div>
             <div className="flex items-center gap-1">
               <BookOpen size={11} className="text-gray-400" />
-              <span className="text-xs text-gray-500">{formatNumber(story.totalChapters)} chương</span>
+              <span className="text-xs text-gray-500">{formatNumber(story.totalChapters)} {t('chaptersLabel')}</span>
             </div>
             <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColor(story.status)}`}>
               {statusLabel(story.status)}

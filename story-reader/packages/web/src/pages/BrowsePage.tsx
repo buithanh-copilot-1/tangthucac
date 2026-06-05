@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { LayoutGrid, List, SlidersHorizontal } from 'lucide-react';
-import { categories } from '@story-reader/shared';
+import { categories, translate, type TranslationKey } from '@story-reader/shared';
 import type { Genre, Story } from '@story-reader/shared';
 import Layout from '../components/layout/Layout';
 import StoryCard from '../components/story/StoryCard';
@@ -12,16 +12,13 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 type SortOption = 'views' | 'updatedAt' | 'rating';
 type StatusFilter = 'all' | 'ongoing' | 'completed';
 
-const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'views', label: 'Lượt đọc' },
-  { value: 'updatedAt', label: 'Mới nhất' },
-  { value: 'rating', label: 'Đánh giá' },
-];
-
 export default function BrowsePage() {
+  const { readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
+
   useDocumentMeta({
-    title: 'Duyet truyen',
-    description: 'Duyet truyen theo the loai, trang thai, luot doc va danh gia.',
+    title: t('browse'),
+    description: t('browse'),
   });
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,7 +62,7 @@ export default function BrowsePage() {
   };
 
   return (
-    <Layout title="Khám Phá" showBack={false}>
+    <Layout title={t('browse')} showBack={false}>
       {/* Genre chips */}
       <div className="sticky top-14 z-30 bg-white border-b border-gray-100 px-0 py-3">
         <div className="flex gap-2 px-4 lg:px-6 overflow-x-auto no-scrollbar lg:flex-wrap">
@@ -74,7 +71,7 @@ export default function BrowsePage() {
             className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all
               ${!selectedGenre ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600'}`}
           >
-            Tất cả
+            {t('allLabel')}
           </button>
           {categories.map((cat) => (
             <CategoryBadge key={cat.id} category={cat} selected={selectedGenre === cat.id} onClick={() => handleGenre(cat.id)} />
@@ -84,7 +81,7 @@ export default function BrowsePage() {
 
       {/* Controls bar */}
       <div className="flex items-center justify-between px-4 lg:px-6 py-3">
-        <span className="text-sm text-gray-500">{total} truyện</span>
+        <span className="text-sm text-gray-500">{total} {t('storiesLabel')}</span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowFilters((v) => !v)}
@@ -92,7 +89,7 @@ export default function BrowsePage() {
               ${showFilters ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-gray-600 border-gray-200'}`}
           >
             <SlidersHorizontal size={13} />
-            Lọc
+            {t('filter')}
           </button>
           <button
             onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
@@ -107,12 +104,16 @@ export default function BrowsePage() {
       {showFilters && (
         <div className="mx-4 lg:mx-6 mb-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
           <div className="mb-3">
-            <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Sắp xếp</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">{t('sortLabel')}</p>
             <div className="flex flex-wrap gap-2">
-              {sortOptions.map((opt) => (
+              {[
+                { value: 'views', label: t('sortViews') },
+                { value: 'updatedAt', label: t('sortNewest') },
+                { value: 'rating', label: t('sortRating') },
+              ].map((opt) => (
                 <button
                   key={opt.value}
-                  onClick={() => setSort(opt.value)}
+                  onClick={() => setSort(opt.value as SortOption)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all
                     ${sort === opt.value ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-gray-600 border-gray-200'}`}
                 >
@@ -122,7 +123,7 @@ export default function BrowsePage() {
             </div>
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Trạng thái</p>
+            <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">{t('statusLabel')}</p>
             <div className="flex gap-2">
               {(['all', 'ongoing', 'completed'] as StatusFilter[]).map((s) => (
                 <button
@@ -131,7 +132,7 @@ export default function BrowsePage() {
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all
                     ${statusFilter === s ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-gray-600 border-gray-200'}`}
                 >
-                  {s === 'all' ? 'Tất cả' : s === 'ongoing' ? 'Đang ra' : 'Hoàn thành'}
+                  {s === 'all' ? t('allLabel') : s === 'ongoing' ? t('ongoingLabel') : t('completedLabel')}
                 </button>
               ))}
             </div>
@@ -146,7 +147,7 @@ export default function BrowsePage() {
             <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full" />
           </div>
         ) : stories.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">Không tìm thấy truyện</div>
+          <div className="text-center py-16 text-gray-400">{t('noStoriesFound')}</div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
             {stories.map((s) => <StoryCard key={s.id} story={s} />)}
@@ -164,7 +165,7 @@ export default function BrowsePage() {
             disabled={loading}
             className="w-full mt-4 py-3 text-sm font-medium text-primary-500 border border-primary-200 rounded-2xl disabled:opacity-50"
           >
-            {loading ? 'Đang tải...' : 'Xem thêm'}
+            {loading ? t('loading') : t('loadMore')}
           </button>
         )}
       </div>

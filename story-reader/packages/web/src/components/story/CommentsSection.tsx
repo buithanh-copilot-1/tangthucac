@@ -5,6 +5,7 @@ import { formatDate } from '@story-reader/shared';
 import { useStore } from '../../store/useStore';
 import { useToast } from '../../store/useToast';
 import { commentApi, type Comment } from '../../services/engagement.api';
+import { translate } from '@story-reader/shared';
 
 const AVATAR_COLORS = ['bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500', 'bg-pink-500'];
 
@@ -30,6 +31,7 @@ function CommentItem({
   onDelete: (id: string) => void;
   currentUserId?: string;
 }) {
+  const lang = useStore.getState().readerSettings.language;
   return (
     <div className={`flex gap-2.5 ${isReply ? 'ml-9 mt-3' : ''}`}>
       {isReply && <CornerDownRight size={14} className="text-gray-300 mt-2 flex-shrink-0" />}
@@ -47,12 +49,12 @@ function CommentItem({
         <div className="flex items-center gap-4 mt-1 ml-1">
           {!isReply && (
             <button onClick={() => onReply(comment)} className="text-xs text-gray-500 font-medium">
-              Trả lời
+              {translate(lang, 'reply')}
             </button>
           )}
           {currentUserId === comment.userId && (
             <button onClick={() => onDelete(comment.id)} className="text-xs text-red-400 font-medium flex items-center gap-1">
-              <Trash2 size={11} /> Xóa
+              <Trash2 size={11} /> {translate(lang, 'delete')}
             </button>
           )}
         </div>
@@ -68,6 +70,7 @@ function CommentItem({
 export default function CommentsSection({ storyId }: { storyId: string }) {
   const navigate = useNavigate();
   const currentUser = useStore((s) => s.currentUser);
+  const lang = useStore.getState().readerSettings.language;
   const toast = useToast();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +93,7 @@ export default function CommentsSection({ storyId }: { storyId: string }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) {
-      toast.info('Đăng nhập để bình luận');
+      toast.info(translate(lang, 'loginToComment'));
       navigate('/login', { state: { from: `/story/${storyId}` } });
       return;
     }
@@ -102,7 +105,7 @@ export default function CommentsSection({ storyId }: { storyId: string }) {
       setReplyTo(null);
       load();
     } catch {
-      toast.error('Gửi bình luận thất bại');
+      toast.error(translate(lang, 'commentSendFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -112,9 +115,9 @@ export default function CommentsSection({ storyId }: { storyId: string }) {
     try {
       await commentApi.remove(id);
       load();
-      toast.success('Đã xóa bình luận');
+      toast.success(translate(lang, 'commentDeleted'));
     } catch {
-      toast.error('Xóa thất bại');
+      toast.error(translate(lang, 'deleteFailed'));
     }
   };
 
@@ -122,7 +125,7 @@ export default function CommentsSection({ storyId }: { storyId: string }) {
     <div className="mt-6">
       <h3 className="flex items-center gap-2 text-base font-bold text-gray-900 mb-4">
         <MessageCircle size={18} className="text-primary-500" />
-        Bình luận
+        {translate(lang, 'comments')}
         <span className="text-sm font-normal text-gray-400">({totalCount})</span>
       </h3>
 
@@ -131,16 +134,16 @@ export default function CommentsSection({ storyId }: { storyId: string }) {
         {replyTo && (
           <div className="flex items-center justify-between bg-primary-50 rounded-lg px-3 py-1.5 mb-2">
             <span className="text-xs text-primary-600">
-              Đang trả lời <b>{replyTo.user.displayName ?? replyTo.user.username}</b>
+              {translate(lang, 'replyingTo')} <b>{replyTo.user.displayName ?? replyTo.user.username}</b>
             </span>
-            <button type="button" onClick={() => setReplyTo(null)} className="text-xs text-gray-400">Hủy</button>
+            <button type="button" onClick={() => setReplyTo(null)} className="text-xs text-gray-400">{translate(lang, 'cancel')}</button>
           </div>
         )}
         <div className="flex items-end gap-2">
-          <textarea
+            <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={currentUser ? 'Viết bình luận...' : 'Đăng nhập để bình luận...'}
+            placeholder={currentUser ? translate(lang, 'writeComment') : translate(lang, 'writeCommentPlaceholder')}
             rows={1}
             className="flex-1 resize-none bg-gray-50 border border-gray-200 rounded-2xl px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-primary-400 max-h-32"
             onInput={(e) => {
@@ -167,8 +170,8 @@ export default function CommentsSection({ storyId }: { storyId: string }) {
       ) : comments.length === 0 ? (
         <div className="text-center py-8 text-gray-400">
           <MessageCircle size={32} className="mx-auto mb-2 opacity-40" />
-          <p className="text-sm">Chưa có bình luận nào</p>
-          <p className="text-xs mt-0.5">Hãy là người đầu tiên!</p>
+          <p className="text-sm">{translate(lang, 'noComments')}</p>
+          <p className="text-xs mt-0.5">{translate(lang, 'beFirstToComment')}</p>
         </div>
       ) : (
         <div className="space-y-4">

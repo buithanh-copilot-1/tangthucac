@@ -1,7 +1,8 @@
 import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Story } from '@story-reader/shared';
-import { formatNumber } from '@story-reader/shared';
+import { formatNumber, translate, type TranslationKey } from '@story-reader/shared';
+import { useStore } from '../store/useStore';
 
 interface StoryCardProps {
   story: Story;
@@ -10,6 +11,8 @@ interface StoryCardProps {
 }
 
 export default function StoryCard({ story, variant = 'grid', onPress }: StoryCardProps) {
+  const readerSettings = useStore((s) => s.readerSettings);
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
   if (variant === 'horizontal') {
     return (
       <TouchableOpacity onPress={onPress} activeOpacity={0.85} style={styles.horizontal}>
@@ -17,7 +20,7 @@ export default function StoryCard({ story, variant = 'grid', onPress }: StoryCar
           <Image source={{ uri: story.cover }} style={styles.horizontalCover} resizeMode="cover" />
           {story.isHot && (
             <View style={styles.hotBadge}>
-              <Text style={styles.hotText}>HOT</Text>
+              <Text style={styles.hotText}>{t('hotLabel')}</Text>
             </View>
           )}
         </View>
@@ -38,7 +41,7 @@ export default function StoryCard({ story, variant = 'grid', onPress }: StoryCar
           <Image source={{ uri: story.cover }} style={styles.listCover} resizeMode="cover" />
           {story.isHot && (
             <View style={styles.hotBadge}>
-              <Text style={styles.hotText}>HOT</Text>
+              <Text style={styles.hotText}>{t('hotLabel')}</Text>
             </View>
           )}
         </View>
@@ -63,12 +66,12 @@ export default function StoryCard({ story, variant = 'grid', onPress }: StoryCar
         <Image source={{ uri: story.cover }} style={styles.gridCover} resizeMode="cover" />
         {story.isHot && (
           <View style={styles.hotBadge}>
-            <Text style={styles.hotText}>HOT</Text>
+            <Text style={styles.hotText}>{t('hotLabel')}</Text>
           </View>
         )}
         {story.status === 'completed' && (
           <View style={[styles.hotBadge, { right: 6, left: undefined, backgroundColor: '#3b82f6' }]}>
-            <Text style={styles.hotText}>Full</Text>
+            <Text style={styles.hotText}>{t('completedLabel')}</Text>
           </View>
         )}
       </View>

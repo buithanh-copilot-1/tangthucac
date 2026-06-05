@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Star, BookOpen, Eye, Heart, Share2, ChevronDown, ChevronUp, CheckCircle2, BookMarked, Plus, X, Loader2 } from 'lucide-react';
-import { categories, formatNumber, formatDate, statusLabel, statusColor } from '@story-reader/shared';
+import { categories, formatNumber, formatDate, statusLabel, statusColor, translate, type TranslationKey } from '@story-reader/shared';
 import type { ShelfStatus, Story, Chapter, ReadingProgress } from '@story-reader/shared';
 import { useStore } from '../store/useStore';
 import { useToast } from '../store/useToast';
@@ -12,10 +12,10 @@ import CommentsSection from '../components/story/CommentsSection';
 import { StoryDetailSkeleton } from '../components/common/Skeleton';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
-const SHELF_OPTIONS: { status: ShelfStatus; label: string; icon: typeof BookOpen; color: string; activeCls: string }[] = [
-  { status: 'reading',      label: 'Đang đọc',   icon: BookOpen,     color: '#3b82f6', activeCls: 'bg-blue-500 text-white border-blue-500' },
-  { status: 'completed',    label: 'Đã đọc',      icon: CheckCircle2, color: '#22c55e', activeCls: 'bg-green-500 text-white border-green-500' },
-  { status: 'want_to_read', label: 'Muốn đọc',   icon: BookMarked,   color: '#8b5cf6', activeCls: 'bg-purple-500 text-white border-purple-500' },
+const SHELF_OPTIONS: { status: ShelfStatus; icon: typeof BookOpen; color: string; activeCls: string }[] = [
+  { status: 'reading',      icon: BookOpen,     color: '#3b82f6', activeCls: 'bg-blue-500 text-white border-blue-500' },
+  { status: 'completed',    icon: CheckCircle2, color: '#22c55e', activeCls: 'bg-green-500 text-white border-green-500' },
+  { status: 'want_to_read', icon: BookMarked,   color: '#8b5cf6', activeCls: 'bg-purple-500 text-white border-purple-500' },
 ];
 
 const CHAPTERS_PER_PAGE = 50;
@@ -27,9 +27,12 @@ export default function StoryDetailPage() {
   const [story, setStory] = useState<Story | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loadingStory, setLoadingStory] = useState(true);
+  const { readerSettings } = useStore();
+  const t = (key: TranslationKey) => translate(readerSettings.language, key);
+
   useDocumentMeta({
-    title: story?.title ?? 'Chi tiet truyen',
-    description: story ? `${story.title} cua ${story.author}. ${story.description.slice(0, 140)}` : 'Thong tin chi tiet truyen tren TruyenHay.',
+    title: story?.title ?? t('storyNotFoundTitle'),
+    description: story ? `${story.title} cua ${story.author}. ${story.description.slice(0, 140)}` : t('storyNotFoundMessage'),
   });
   const {
     isBookmarked, isBookmarkPending, addBookmark, removeBookmark,
@@ -65,10 +68,10 @@ export default function StoryDetailPage() {
 
   if (!story) {
     return (
-      <Layout showBack title="Không tìm thấy">
+      <Layout showBack title={t('storyNotFoundTitle')}>
         <div className="flex flex-col items-center justify-center py-20 text-gray-400">
           <span className="text-5xl mb-4">😔</span>
-          <p>Truyện không tồn tại</p>
+          <p>{t('storyNotFoundMessage')}</p>
         </div>
       </Layout>
     );
@@ -167,7 +170,7 @@ export default function StoryDetailPage() {
                   <Star size={14} className="text-yellow-400 fill-yellow-400" />
                   <span className="text-sm font-bold text-gray-900">{story.rating.toFixed(1)}</span>
                 </div>
-                <span className="text-[10px] text-gray-500">{formatNumber(story.ratingCount)} đánh giá</span>
+                <span className="text-[10px] text-gray-500">{formatNumber(story.ratingCount)} {t('ratingsLabel')}</span>
               </div>
               <div className="w-px bg-gray-100" />
               <div className="flex flex-col items-center gap-1">
@@ -175,7 +178,7 @@ export default function StoryDetailPage() {
                   <BookOpen size={14} className="text-blue-500" />
                   <span className="text-sm font-bold text-gray-900">{formatNumber(story.totalChapters)}</span>
                 </div>
-                <span className="text-[10px] text-gray-500">Chương</span>
+                <span className="text-[10px] text-gray-500">{t('chaptersLabel')}</span>
               </div>
               <div className="w-px bg-gray-100" />
               <div className="flex flex-col items-center gap-1">
@@ -183,7 +186,7 @@ export default function StoryDetailPage() {
                   <Eye size={14} className="text-green-500" />
                   <span className="text-sm font-bold text-gray-900">{formatNumber(story.views)}</span>
                 </div>
-                <span className="text-[10px] text-gray-500">Lượt đọc</span>
+                <span className="text-[10px] text-gray-500">{t('viewsLabel')}</span>
               </div>
             </div>
 
@@ -191,7 +194,7 @@ export default function StoryDetailPage() {
             {progress && (
               <div className="mt-3 bg-white rounded-xl px-4 py-3 border border-gray-100">
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
-                  <span className="font-medium text-gray-700">Tiến độ đọc</span>
+                  <span className="font-medium text-gray-700">{t('readingProgress')}</span>
                   <span className="text-primary-500 font-semibold">
                     C.{progress.chapterNumber} / {formatNumber(story.totalChapters)} — {readPercent}%
                   </span>
@@ -202,7 +205,7 @@ export default function StoryDetailPage() {
                     style={{ width: `${readPercent}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-gray-400 mt-1.5">Đọc lần cuối {formatDate(progress.lastRead)}</p>
+                <p className="text-[10px] text-gray-400 mt-1.5">{t('lastRead')} {formatDate(progress.lastRead)}</p>
               </div>
             )}
 
@@ -224,13 +227,13 @@ export default function StoryDetailPage() {
                 onClick={() => setDescExpanded((v) => !v)}
                 className="flex items-center gap-1 text-primary-500 text-xs font-medium mt-1 lg:hidden"
               >
-                {descExpanded ? <><ChevronUp size={13} /> Thu gọn</> : <><ChevronDown size={13} /> Xem thêm</>}
+                {descExpanded ? <><ChevronUp size={13} /> {t('showLess')}</> : <><ChevronDown size={13} /> {t('showMore')}</>}
               </button>
             </div>
 
             {/* Đánh giá truyện */}
             <div className="mt-4 bg-white rounded-2xl border border-gray-100 px-4 py-3.5">
-              <p className="text-xs font-semibold text-gray-500 mb-2">ĐÁNH GIÁ TRUYỆN</p>
+              <p className="text-xs font-semibold text-gray-500 mb-2">{t('ratingsTitle')}</p>
               <RatingStars
                 storyId={story.id}
                 onRated={(avg, count) =>
@@ -246,7 +249,7 @@ export default function StoryDetailPage() {
                 className="flex-1 btn-primary flex items-center justify-center gap-2"
               >
                 <BookOpen size={16} />
-                {progress ? `Đọc tiếp C.${progress.chapterNumber}` : 'Đọc từ đầu'}
+                {progress ? `${t('continueReading')} C.${progress.chapterNumber}` : t('startReading')}
               </button>
               <button
                 onClick={() => bookmarked ? removeBookmark(story.id) : addBookmark(story.id)}
@@ -268,7 +271,7 @@ export default function StoryDetailPage() {
                     try { await navigator.share({ title: story.title, url }); } catch { /* cancelled */ }
                   } else {
                     await navigator.clipboard.writeText(url);
-                    toast.success('Đã sao chép link truyện');
+                    toast.success(t('copiedStoryLink'));
                   }
                 }}
                 className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-gray-200 bg-white"
@@ -279,7 +282,7 @@ export default function StoryDetailPage() {
 
             {/* Shelf / Tủ truyện section */}
             <div className="mt-4 relative">
-              <p className="text-xs font-semibold text-gray-500 mb-2">TỦ TRUYỆN</p>
+              <p className="text-xs font-semibold text-gray-500 mb-2">{t('libraryTitle')}</p>
 
               <button
                 onClick={() => setShowShelfMenu((v) => !v)}
@@ -301,8 +304,12 @@ export default function StoryDetailPage() {
                         <currentShelf.icon size={16} style={{ color: currentShelf.color }} />
                       </div>
                       <div className="text-left">
-                        <p className="text-sm font-semibold text-gray-900">{currentShelf.label}</p>
-                        <p className="text-xs text-gray-400">Nhấn để thay đổi</p>
+                        <p className="text-sm font-semibold text-gray-900">{
+                          shelfEntry ? (
+                            shelfEntry.status === 'reading' ? t('reading') : shelfEntry.status === 'completed' ? t('completed') : t('wantToRead')
+                          ) : t('addToShelfLabel')
+                        }</p>
+                        <p className="text-xs text-gray-400">{t('pressToChange')}</p>
                       </div>
                     </>
                   ) : (
@@ -311,8 +318,8 @@ export default function StoryDetailPage() {
                         <Plus size={16} className="text-gray-400" />
                       </div>
                       <div className="text-left">
-                        <p className="text-sm font-medium text-gray-600">Thêm vào tủ truyện</p>
-                        <p className="text-xs text-gray-400">Đang đọc · Đã đọc · Muốn đọc</p>
+                        <p className="text-sm font-medium text-gray-600">{t('addToShelfLabel')}</p>
+                        <p className="text-xs text-gray-400">{t('reading')} · {t('completed')} · {t('wantToRead')}</p>
                       </div>
                     </>
                   )}
@@ -348,7 +355,9 @@ export default function StoryDetailPage() {
                           <opt.icon size={18} style={{ color: opt.color }} />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-semibold text-gray-900">{opt.label}</p>
+                          <p className="text-sm font-semibold text-gray-900">{
+                            opt.status === 'reading' ? t('reading') : opt.status === 'completed' ? t('completed') : t('wantToRead')
+                          }</p>
                         </div>
                         {isActive && <CheckCircle2 size={18} style={{ color: opt.color }} />}
                       </button>
@@ -363,7 +372,7 @@ export default function StoryDetailPage() {
                         className="w-full flex items-center gap-3 px-4 py-3 text-red-500 active:bg-red-50"
                       >
                         <X size={16} />
-                        <span className="text-sm font-medium">Xóa khỏi tủ truyện</span>
+                        <span className="text-sm font-medium">{t('removeFromShelf')}</span>
                       </button>
                     </>
                   )}
@@ -387,6 +396,7 @@ export default function StoryDetailPage() {
                 jumpChapter={jumpChapter}
                 setJumpChapter={setJumpChapter}
                 handleJumpChapter={handleJumpChapter}
+                t={t}
               />
             </div>
 
@@ -413,6 +423,7 @@ export default function StoryDetailPage() {
                 jumpChapter={jumpChapter}
                 setJumpChapter={setJumpChapter}
                 handleJumpChapter={handleJumpChapter}
+                t={t}
               />
             </div>
             <div className="mt-6">
@@ -444,6 +455,7 @@ interface ChapterListSectionProps {
   jumpChapter: string;
   setJumpChapter: (v: string) => void;
   handleJumpChapter: (e: FormEvent) => void;
+  t: (key: import('@story-reader/shared').TranslationKey) => string;
 }
 
 function ChapterListSection({
@@ -460,19 +472,20 @@ function ChapterListSection({
   jumpChapter,
   setJumpChapter,
   handleJumpChapter,
+  t,
 }: ChapterListSectionProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-bold text-gray-900">
-          Danh sách chương
-          <span className="text-sm text-gray-400 font-normal ml-2">({chapters.length} chương)</span>
+          {t('chapterListTitle')}
+          <span className="text-sm text-gray-400 font-normal ml-2">({chapters.length} {t('chaptersLabel')})</span>
         </h2>
         <button
           onClick={() => setChapterSortDesc((v) => !v)}
           className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full"
         >
-          {chapterSortDesc ? 'Mới nhất' : 'Cũ nhất'}
+          {chapterSortDesc ? t('sortNewest') : t('sortOldest')}
           {chapterSortDesc ? <ChevronDown size={12} /> : <ChevronUp size={12} />}
         </button>
       </div>
@@ -484,14 +497,14 @@ function ChapterListSection({
           max={story.totalChapters}
           value={jumpChapter}
           onChange={(e) => setJumpChapter(e.target.value)}
-          placeholder="Nhap chuong"
+          placeholder={t('enterChapterPlaceholder')}
           className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-primary-400"
         />
         <button
           type="submit"
           className="h-10 rounded-xl bg-gray-900 px-4 text-sm font-semibold text-white"
         >
-          Di toi
+          {t('goTo')}
         </button>
       </form>
 
@@ -509,13 +522,13 @@ function ChapterListSection({
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-medium truncate
                   ${isCurrentChapter ? 'text-primary-600' : isRead ? 'text-gray-400' : 'text-gray-900'}`}>
-                  Chương {ch.number}: {ch.title}
+                  {t('chapter')} {ch.number}: {ch.title}
                 </p>
                 <p className="text-xs text-gray-400 mt-0.5">{formatDate(ch.publishedAt)}</p>
               </div>
               <div className="ml-2 flex-shrink-0">
                 {isCurrentChapter ? (
-                  <span className="text-xs text-primary-500 font-medium">Đang đọc</span>
+                  <span className="text-xs text-primary-500 font-medium">{t('reading')}</span>
                 ) : isRead ? (
                   <CheckCircle2 size={14} className="text-green-400" />
                 ) : null}
@@ -533,7 +546,7 @@ function ChapterListSection({
             disabled={safeChapterPage <= 1}
             className="h-10 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 disabled:opacity-40"
           >
-            Truoc
+            {t('previousChapter')}
           </button>
           <span className="text-xs font-medium text-gray-500">
             Trang {safeChapterPage}/{chapterPageCount}
@@ -544,7 +557,7 @@ function ChapterListSection({
             disabled={safeChapterPage >= chapterPageCount}
             className="h-10 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 disabled:opacity-40"
           >
-            Sau
+            {t('nextChapter')}
           </button>
         </div>
       )}
