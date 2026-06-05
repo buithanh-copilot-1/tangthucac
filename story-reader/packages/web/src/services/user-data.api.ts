@@ -30,6 +30,6 @@ export const progressApi = {
 
 export const settingsApi = {
   get:    () => api.get<Record<string, string> | null>('/users/me/settings'),
-  update: (data: Partial<{ fontSize: string; theme: string; lineHeight: string; fontFamily: string }>) =>
+  update: (data: Partial<{ fontSize: string; theme: string; lineHeight: string; fontFamily: string; language: string }>) =>
     api.patch<Record<string, string>>('/users/me/settings', data),
 };

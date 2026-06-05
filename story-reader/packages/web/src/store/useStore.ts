@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ReaderSettings, ReadingProgress, Story, ShelfEntry, ShelfStatus, User } from '@story-reader/shared';
+import { defaultReaderSettings, normalizeReaderSettings } from '@story-reader/shared';
+import type { ReaderSettings, ReadingProgress, Story, ShelfEntry, ShelfStatus, User, ReaderTheme } from '@story-reader/shared';
 import { authApi, type AuthResponse } from '../services/auth.api';
 import { shelfApi, bookmarksApi, progressApi, settingsApi } from '../services/user-data.api';
 import { ApiError } from '../services/api';
@@ -59,6 +60,9 @@ interface AppState {
   // ── Reader settings (lưu local, theo device) ──────────────────────────
   readerSettings: ReaderSettings;
   updateReaderSettings: (settings: Partial<ReaderSettings>) => void;
+  // App-wide UI theme (kept separate from reader-specific appearance)
+  appTheme: ReaderTheme;
+  setAppTheme: (theme: ReaderTheme) => void;
 
   // ── Recent searches ───────────────────────────────────────────────────
   recentSearches: string[];
@@ -68,6 +72,10 @@ interface AppState {
   // ── Recently viewed ───────────────────────────────────────────────────
   recentlyViewed: Story[];
   addRecentlyViewed: (story: Story) => void;
+
+  // ── UI state ───────────────────────────────────────────────────────────
+  sidebarCollapsed: boolean;
+  toggleSidebar: () => void;
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -217,8 +225,8 @@ export const useStore = create<AppState>()(
             ? settingsRes.value
             : null;
           const mergedSettings = serverSettings
-            ? { ...get().readerSettings, ...serverSettings } as ReaderSettings
-            : get().readerSettings;
+            ? normalizeReaderSettings({ ...get().readerSettings, ...serverSettings })
+            : normalizeReaderSettings(get().readerSettings);
 
           set(() => ({
             shelf: newShelf,
@@ -344,10 +352,13 @@ export const useStore = create<AppState>()(
       clearHistory: () => set({ history: [] }),
 
       // ── Reader settings ────────────────────────────────────────────────
-      readerSettings: { fontSize: 'md', theme: 'light', lineHeight: 'relaxed', fontFamily: 'sans' },
+      readerSettings: defaultReaderSettings,
+      // App-wide theme (separate from readerSettings.background)
+      appTheme: defaultReaderSettings.theme,
+      setAppTheme: (theme) => set(() => ({ appTheme: theme })),
       updateReaderSettings: (settings) => {
         set((s) => {
-          const next = { ...s.readerSettings, ...settings };
+          const next = normalizeReaderSettings({ ...s.readerSettings, ...settings });
           // Nếu đang login → debounce save lên API
           if (s.currentUser) debounceSaveSettings(next);
           return { readerSettings: next };
@@ -368,18 +379,33 @@ export const useStore = create<AppState>()(
         set((s) => ({
           recentlyViewed: [story, ...s.recentlyViewed.filter((st) => st.id !== story.id)].slice(0, 20),
         })),
+
+      // ── UI state ───────────────────────────────────────────────────────
+      sidebarCollapsed: false,
+      toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
     }),
     {
       name: 'story-reader-storage',
       partialize: (s) => ({
-        currentUser:     s.currentUser,
-        refreshToken:    s.refreshToken,
+        currentUser:      s.currentUser,
+        refreshToken:     s.refreshToken,
         // shelf/bookmarks/history KHÔNG persist — được load từ API khi login
         // Chỉ cache tạm thời trong memory (session)
-        readerSettings:  s.readerSettings,   // device preference
-        recentSearches:  s.recentSearches,
-        recentlyViewed:  s.recentlyViewed,
+        readerSettings:   s.readerSettings,   // device preference
+        appTheme:         s.appTheme,
+        recentSearches:   s.recentSearches,
+        recentlyViewed:   s.recentlyViewed,
+        sidebarCollapsed: s.sidebarCollapsed,
       }),
+      merge: (persisted, current) => {
+        const state = persisted as Partial<AppState> | undefined;
+        return {
+          ...current,
+          ...state,
+          readerSettings: normalizeReaderSettings(state?.readerSettings),
+          appTheme: state?.appTheme ?? current.appTheme,
+        };
+      },
     },
   ),
 );

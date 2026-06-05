@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useStore } from './store/useStore';
 import ToastContainer from './components/ui/ToastContainer';
 import HomePage from './pages/HomePage';
@@ -22,9 +23,20 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function ThemeSync() {
+  const theme = useStore((s) => s.appTheme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ThemeSync />
       <ToastContainer />
       <Routes>
         {/* Public */}

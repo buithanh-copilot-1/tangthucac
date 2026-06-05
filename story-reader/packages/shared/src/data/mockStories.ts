@@ -5,7 +5,7 @@ export const mockStories: Story[] = [
     id: 'td-001',
     title: 'Đấu Phá Thương Khung',
     author: 'Thiên Tàm Thổ Đậu',
-    cover: 'https://picsum.photos/seed/story1/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1457472571i/29455894.jpg',
     genre: 'tien-hiep',
     tags: ['Tu tiên', 'Phấn đấu', 'Chiến đấu', 'Đan dược'],
     description:
@@ -23,7 +23,7 @@ export const mockStories: Story[] = [
     id: 'tth-002',
     title: 'Tu Chân Giới',
     author: 'Vong Ngữ',
-    cover: 'https://picsum.photos/seed/story2/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1780029114i/35672885.jpg',
     genre: 'tien-hiep',
     tags: ['Tu tiên', 'Thần thông', 'Bảo bối', 'Trận pháp'],
     description:
@@ -41,7 +41,7 @@ export const mockStories: Story[] = [
     id: 'bgd-003',
     title: 'Bạch Giang Đồ',
     author: 'Nhĩ Căn',
-    cover: 'https://picsum.photos/seed/story3/300/400',
+    cover: 'https://images.unsplash.com/photo-1567266565245-c08dc046815f?w=300&h=400&fit=crop',
     genre: 'tien-hiep',
     tags: ['Tu tiên', 'Hệ thống', 'Mạnh mẽ', 'Phản phái'],
     description:
@@ -58,7 +58,7 @@ export const mockStories: Story[] = [
     id: 'dts-004',
     title: 'Đấu Thiên',
     author: 'Mặc Thấp Thanh Thành',
-    cover: 'https://picsum.photos/seed/story4/300/400',
+    cover: 'https://images.unsplash.com/photo-1749214414063-982fad381819?w=300&h=400&fit=crop',
     genre: 'tien-hiep',
     tags: ['Tu tiên', 'Vũ khí thần', 'Không gian dị giới'],
     description:
@@ -74,7 +74,7 @@ export const mockStories: Story[] = [
     id: 'nt-005',
     title: 'Cẩm Tú Vị Ương',
     author: 'Phỉ Ngã Tư Tồn',
-    cover: 'https://picsum.photos/seed/story5/300/400',
+    cover: 'https://images.unsplash.com/photo-1513092024247-2d6debc90f1d?w=300&h=400&fit=crop',
     genre: 'ngon-tinh',
     tags: ['Cung đấu', 'Cổ đại', 'Ngôn tình', 'Xuyên không'],
     description:
@@ -91,7 +91,7 @@ export const mockStories: Story[] = [
     id: 'nt-006',
     title: 'Thiên Kim Quy Lai',
     author: 'Bắc Lịch Quân',
-    cover: 'https://picsum.photos/seed/story6/300/400',
+    cover: 'https://images.unsplash.com/photo-1675387404357-096f658a53f0?w=300&h=400&fit=crop',
     genre: 'ngon-tinh',
     tags: ['Trọng sinh', 'Đô thị', 'Phục thù', 'Ngôn tình'],
     description:
@@ -108,7 +108,7 @@ export const mockStories: Story[] = [
     id: 'nt-007',
     title: 'Tổng Tài Thâm Tình',
     author: 'Tiểu Tiểu Nhất',
-    cover: 'https://picsum.photos/seed/story7/300/400',
+    cover: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=300&h=400&fit=crop',
     genre: 'ngon-tinh',
     tags: ['Hiện đại', 'Tổng tài', 'Tình yêu', 'Ngọt ngào'],
     description:
@@ -124,7 +124,7 @@ export const mockStories: Story[] = [
     id: 'dt-008',
     title: 'Đô Thị Siêu Phẩm',
     author: 'Không Linh Tử',
-    cover: 'https://picsum.photos/seed/story8/300/400',
+    cover: 'https://images.unsplash.com/photo-1617336422396-e1dfc4210ec5?w=300&h=400&fit=crop',
     genre: 'do-thi',
     tags: ['Đô thị', 'Tu tiên', 'Y thuật', 'Mạnh mẽ'],
     description:
@@ -141,7 +141,7 @@ export const mockStories: Story[] = [
     id: 'dt-009',
     title: 'Trọng Sinh Đô Thị Cuồng Tiên',
     author: 'Phong Vũ Kiếm',
-    cover: 'https://picsum.photos/seed/story9/300/400',
+    cover: 'https://images.unsplash.com/photo-1605702012553-e954fbde66eb?w=300&h=400&fit=crop',
     genre: 'do-thi',
     tags: ['Trọng sinh', 'Đô thị', 'Tu tiên', 'Dị năng'],
     description:
@@ -157,7 +157,7 @@ export const mockStories: Story[] = [
     id: 'kh-010',
     title: 'Cô Đơn Hiệp Khách',
     author: 'Kim Dung',
-    cover: 'https://picsum.photos/seed/story10/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1177775443i/731183.jpg',
     genre: 'kiem-hiep',
     tags: ['Kiếm hiệp', 'Cổ đại', 'Võ lâm', 'Giang hồ'],
     description:
@@ -174,7 +174,7 @@ export const mockStories: Story[] = [
     id: 'kh-011',
     title: 'Thiên Long Bát Bộ',
     author: 'Kim Dung',
-    cover: 'https://picsum.photos/seed/story11/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1596278911i/54775260.jpg',
     genre: 'kiem-hiep',
     tags: ['Kiếm hiệp', 'Cổ đại', 'Anh hùng', 'Tình nghĩa'],
     description:
@@ -191,7 +191,7 @@ export const mockStories: Story[] = [
     id: 'kh-012',
     title: 'Phong Vân',
     author: 'Mã Vinh Thành',
-    cover: 'https://picsum.photos/seed/story12/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1267262099i/2776243.jpg',
     genre: 'kiem-hiep',
     tags: ['Kiếm hiệp', 'Huynh đệ', 'Tranh bá', 'Võ công'],
     description:
@@ -207,7 +207,7 @@ export const mockStories: Story[] = [
     id: 'dg-013',
     title: 'Dị Giới Thần Ma Lục',
     author: 'Đường Gia Tam Thiếu',
-    cover: 'https://picsum.photos/seed/story13/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1417673953i/23669798.jpg',
     genre: 'di-gioi',
     tags: ['Dị giới', 'Tu tiên', 'Hệ thống', 'Linh hồn'],
     description:
@@ -225,7 +225,7 @@ export const mockStories: Story[] = [
     id: 'dg-014',
     title: 'Linh Vũ Thiên Hạ',
     author: 'Mộng Nhập Thần Cơ',
-    cover: 'https://picsum.photos/seed/story14/300/400',
+    cover: 'https://images.unsplash.com/photo-1577493340887-b7bfff550145?w=300&h=400&fit=crop',
     genre: 'di-gioi',
     tags: ['Dị giới', 'Linh vật', 'Tu tiên', 'Mạo hiểm'],
     description:
@@ -241,7 +241,7 @@ export const mockStories: Story[] = [
     id: 'ts-015',
     title: 'Trọng Sinh Chi Tối Cường Kiếm Thần',
     author: 'Phong Ma Thiên Hạ',
-    cover: 'https://picsum.photos/seed/story15/300/400',
+    cover: 'https://images.unsplash.com/photo-1758090812831-22cbcf19c922?w=300&h=400&fit=crop',
     genre: 'trong-sinh',
     tags: ['Trọng sinh', 'Kiếm thuật', 'Phục thù', 'Mạnh mẽ'],
     description:
@@ -257,7 +257,7 @@ export const mockStories: Story[] = [
     id: 'ts-016',
     title: 'Hồi Đáp Tuổi 18',
     author: 'Thanh Vân',
-    cover: 'https://picsum.photos/seed/story16/300/400',
+    cover: 'https://images.unsplash.com/photo-1615262239126-1931bdb03182?w=300&h=400&fit=crop',
     genre: 'trong-sinh',
     tags: ['Trọng sinh', 'Học đường', 'Ngôn tình', 'Ngọt ngào'],
     description:
@@ -273,7 +273,7 @@ export const mockStories: Story[] = [
     id: 'hh-017',
     title: 'Vạn Giới Tiên Tông',
     author: 'Lão Nhục',
-    cover: 'https://picsum.photos/seed/story17/300/400',
+    cover: 'https://images.unsplash.com/photo-1477468572316-36979010099d?w=300&h=400&fit=crop',
     genre: 'huyen-huyen',
     tags: ['Huyền huyễn', 'Tu tiên', 'Hệ thống', 'Mạo hiểm'],
     description:
@@ -289,7 +289,7 @@ export const mockStories: Story[] = [
     id: 'hh-018',
     title: 'Thần Mộ',
     author: 'Thần Đông',
-    cover: 'https://picsum.photos/seed/story18/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1531018290i/40743363.jpg',
     genre: 'huyen-huyen',
     tags: ['Huyền huyễn', 'Cổ mộ', 'Thần bí', 'Mạo hiểm'],
     description:
@@ -306,7 +306,7 @@ export const mockStories: Story[] = [
     id: 'khvt-019',
     title: 'Tam Thể',
     author: 'Lưu Từ Hân',
-    cover: 'https://picsum.photos/seed/story19/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1415428227i/20518872.jpg',
     genre: 'khoa-hoc-vien-tuong',
     tags: ['Khoa học', 'Ngoài hành tinh', 'Triết học', 'Vật lý'],
     description:
@@ -324,7 +324,7 @@ export const mockStories: Story[] = [
     id: 'khvt-020',
     title: 'Vũ Trụ Song Sinh',
     author: 'Vũ Hành Không Gian',
-    cover: 'https://picsum.photos/seed/story20/300/400',
+    cover: 'https://images.unsplash.com/photo-1538370965046-79c0d6907d47?w=300&h=400&fit=crop',
     genre: 'khoa-hoc-vien-tuong',
     tags: ['Khoa học', 'Không gian', 'Khám phá', 'Phiêu lưu'],
     description:
@@ -340,7 +340,7 @@ export const mockStories: Story[] = [
     id: 'tien-021',
     title: 'Phàm Nhân Tu Tiên',
     author: 'Vong Ngữ',
-    cover: 'https://picsum.photos/seed/story21/300/400',
+    cover: 'https://images.unsplash.com/photo-1486707471592-8e7eb7e36f78?w=300&h=400&fit=crop',
     genre: 'tien-hiep',
     tags: ['Tu tiên', 'Phàm nhân', 'Kiên trì', 'Thần thông'],
     description:
@@ -358,7 +358,7 @@ export const mockStories: Story[] = [
     id: 'nt-022',
     title: 'Ác Ma Tổng Tài Truy Vợ',
     author: 'Yến Thanh',
-    cover: 'https://picsum.photos/seed/story22/300/400',
+    cover: 'https://images.unsplash.com/photo-1596744743105-b1e229d13036?w=300&h=400&fit=crop',
     genre: 'ngon-tinh',
     tags: ['Hiện đại', 'Tổng tài', 'Hài hước', 'Ngọt ngào'],
     description:
@@ -374,7 +374,7 @@ export const mockStories: Story[] = [
     id: 'dt-023',
     title: 'Chí Tôn Võ Đế',
     author: 'Thiên Tâm',
-    cover: 'https://picsum.photos/seed/story23/300/400',
+    cover: 'https://images.unsplash.com/photo-1654632011771-62b5eea154b8?w=300&h=400&fit=crop',
     genre: 'do-thi',
     tags: ['Đô thị', 'Võ thuật', 'Bí mật', 'Gia tộc'],
     description:
@@ -390,7 +390,7 @@ export const mockStories: Story[] = [
     id: 'ts-024',
     title: 'Xuyên Thành Nữ Phụ Phản Công',
     author: 'Cửu Nguyệt Hi',
-    cover: 'https://picsum.photos/seed/story24/300/400',
+    cover: 'https://images.unsplash.com/photo-1727695259138-d5dd0cbe0cea?w=300&h=400&fit=crop',
     genre: 'trong-sinh',
     tags: ['Xuyên không', 'Nữ cường', 'Phản công', 'Hài hước'],
     description:
@@ -406,7 +406,7 @@ export const mockStories: Story[] = [
     id: 'hh-025',
     title: 'Vô Hạn Khủng Bố',
     author: 'Huyễn Vũ',
-    cover: 'https://picsum.photos/seed/story25/300/400',
+    cover: 'https://images.unsplash.com/photo-1597839219216-a773cb2473e4?w=300&h=400&fit=crop',
     genre: 'huyen-huyen',
     tags: ['Kinh dị', 'Huyền huyễn', 'Nhóm', 'Sinh tồn'],
     description:
@@ -423,7 +423,7 @@ export const mockStories: Story[] = [
     id: 'kh-026',
     title: 'Xạ Điêu Anh Hùng Truyện',
     author: 'Kim Dung',
-    cover: 'https://picsum.photos/seed/story26/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1542481768i/31117072.jpg',
     genre: 'kiem-hiep',
     tags: ['Kiếm hiệp', 'Cổ đại', 'Anh hùng', 'Tình yêu'],
     description:
@@ -440,7 +440,7 @@ export const mockStories: Story[] = [
     id: 'dg-027',
     title: 'Thần Giới Truyền Thuyết',
     author: 'Hắc Sắc Đoạn Ảnh',
-    cover: 'https://picsum.photos/seed/story27/300/400',
+    cover: 'https://images.unsplash.com/photo-1610926597998-fc7f2c1b89b0?w=300&h=400&fit=crop',
     genre: 'di-gioi',
     tags: ['Dị giới', 'Thần thánh', 'Chiến tranh', 'Sử thi'],
     description:
@@ -456,7 +456,7 @@ export const mockStories: Story[] = [
     id: 'tien-028',
     title: 'Nguyên Tôn',
     author: 'Thiên Tàm Thổ Đậu',
-    cover: 'https://picsum.photos/seed/story28/300/400',
+    cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1640687626i/59957846.jpg',
     genre: 'tien-hiep',
     tags: ['Tu tiên', 'Nguyên lực', 'Cạnh tranh', 'Tình yêu'],
     description:
@@ -473,7 +473,7 @@ export const mockStories: Story[] = [
     id: 'nt-029',
     title: 'Hoàng Hậu Không Dễ Làm',
     author: 'Mặc Vũ Linh',
-    cover: 'https://picsum.photos/seed/story29/300/400',
+    cover: 'https://images.unsplash.com/photo-1557228682-25dd18e9053d?w=300&h=400&fit=crop',
     genre: 'ngon-tinh',
     tags: ['Cổ đại', 'Hài hước', 'Cung đấu', 'Mạo hiểm'],
     description:
@@ -489,7 +489,7 @@ export const mockStories: Story[] = [
     id: 'dt-030',
     title: 'Võ Thần',
     author: 'Nghịch Thiên',
-    cover: 'https://picsum.photos/seed/story30/300/400',
+    cover: 'https://images.unsplash.com/photo-1616102343544-95fa53d0068f?w=300&h=400&fit=crop',
     genre: 'do-thi',
     tags: ['Đô thị', 'Võ thuật', 'Dị năng', 'Kinh doanh'],
     description:

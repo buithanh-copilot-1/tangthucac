@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import BottomNav from './BottomNav';
 import Header from './Header';
+import SideNav from './SideNav';
+import { useStore } from '../../store/useStore';
 
 interface LayoutProps {
   children: ReactNode;
@@ -19,15 +21,24 @@ export default function Layout({
   hideHeader = false,
   hideNav = false,
 }: LayoutProps) {
+  const { sidebarCollapsed } = useStore();
+
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center">
-      <div className="w-full max-w-mobile relative flex flex-col min-h-screen">
-        {!hideHeader && <Header title={title} showSearch={showSearch} showBack={showBack} />}
-        <main className={`flex-1 ${!hideHeader ? 'pt-14' : ''} ${!hideNav ? 'pb-20' : ''}`}>
+    <div className="min-h-screen bg-gray-50">
+      {!hideHeader && <Header title={title} showSearch={showSearch} showBack={showBack} />}
+      {!hideNav && <SideNav />}
+      <div
+        className={[
+          !hideHeader ? 'pt-14' : '',
+          !hideNav ? (sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-60') : '',
+          'transition-[padding-left] duration-300',
+        ].filter(Boolean).join(' ')}
+      >
+        <main className={!hideNav ? 'pb-20 lg:pb-8' : ''}>
           {children}
         </main>
-        {!hideNav && <BottomNav />}
       </div>
+      {!hideNav && <BottomNav />}
     </div>
   );
 }

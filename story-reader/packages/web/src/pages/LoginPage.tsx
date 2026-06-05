@@ -2,15 +2,19 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, BookOpen } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { translate, type TranslationKey } from '@story-reader/shared';
 import { useToast } from '../store/useToast';
 import GoogleIcon from '../components/auth/GoogleIcon';
 import { useGoogleAuth } from '../components/auth/useGoogleAuth';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 export default function LoginPage() {
+  const { readerSettings } = useStore();
+  const t = (key: TranslationKey) => translate(readerSettings.language, key);
+
   useDocumentMeta({
-    title: 'Dang nhap',
-    description: 'Dang nhap TruyenHay de dong bo tu truyen va tien do doc.',
+    title: t('login'),
+    description: t('loginPrompt'),
   });
 
   const navigate = useNavigate();
@@ -25,7 +29,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const google = useGoogleAuth(() => {
-    toast.success('Đăng nhập Google thành công!');
+    toast.success(t('googleLoginSuccess'));
     navigate(from, { replace: true });
   });
 
@@ -35,26 +39,26 @@ export default function LoginPage() {
     setLoading(true);
     const result = await login(form.email, form.password);
     setLoading(false);
-    if (result.success) {
-      toast.success('Đăng nhập thành công!');
+      if (result.success) {
+      toast.success(t('loginSuccess'));
       navigate(from, { replace: true });
     } else {
-      setError(result.error ?? 'Đăng nhập thất bại');
+      setError(result.error ?? t('loginFailed'));
     }
   };
 
   const isBusy = loading || google.loading;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center">
-      <div className="w-full max-w-mobile flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex justify-center items-start sm:items-center">
+      <div className="w-full max-w-md flex flex-col sm:shadow-xl sm:rounded-3xl sm:overflow-hidden">
         {/* Hero */}
-        <div className="bg-gradient-to-br from-primary-500 to-primary-700 pt-16 pb-12 px-6 flex flex-col items-center">
+          <div className="bg-gradient-to-br from-primary-500 to-primary-700 pt-16 pb-12 px-6 flex flex-col items-center">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
             <BookOpen size={32} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Chào mừng trở lại</h1>
-          <p className="text-primary-100 text-sm mt-1">Đăng nhập để tiếp tục đọc truyện</p>
+          <h1 className="text-2xl font-bold text-white">{t('welcomeBack')}</h1>
+          <p className="text-primary-100 text-sm mt-1">{t('loginPrompt')}</p>
         </div>
 
         {/* Card */}
@@ -76,12 +80,12 @@ export default function LoginPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                <span className="text-sm font-medium text-gray-600">Đang xử lý...</span>
+                  <span className="text-sm font-medium text-gray-600">{t('processing')}</span>
               </>
             ) : (
               <>
                 <GoogleIcon size={20} />
-                <span className="text-sm font-medium text-gray-700">Tiếp tục với Google</span>
+                <span className="text-sm font-medium text-gray-700">{t('continueWithGoogle')}</span>
               </>
             )}
           </button>
@@ -95,14 +99,14 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px bg-gray-100" />
-            <span className="text-xs text-gray-400">hoặc đăng nhập bằng email</span>
+            <span className="text-xs text-gray-400">{t('orSignInWithEmail')}</span>
             <div className="flex-1 h-px bg-gray-100" />
           </div>
 
           {/* Email form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Email</label>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">{t('email')}</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2">
                   <Mail size={17} className="text-gray-400" />
@@ -119,7 +123,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Mật khẩu</label>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">{t('password')}</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2">
                   <Lock size={17} className="text-gray-400" />
@@ -145,8 +149,8 @@ export default function LoginPage() {
             )}
 
             <div className="flex justify-end -mt-1">
-              <Link to="/forgot-password" className="text-xs font-semibold text-primary-500">
-                Quen mat khau?
+                <Link to="/forgot-password" className="text-xs font-semibold text-primary-500">
+                {t('forgotPassword')}
               </Link>
             </div>
 
@@ -156,12 +160,12 @@ export default function LoginPage() {
               className="w-full bg-primary-500 text-white font-bold py-4 rounded-2xl text-sm active:bg-primary-600 disabled:opacity-60 transition-all"
             >
               {loading ? (
-                <span className="flex items-center justify-center gap-2">
+                  <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Đang đăng nhập...
+                  {t('processing')}
                 </span>
               ) : 'Đăng nhập'}
             </button>
@@ -169,7 +173,7 @@ export default function LoginPage() {
 
           <div className="flex items-center gap-3 my-5">
             <div className="flex-1 h-px bg-gray-100" />
-            <span className="text-xs text-gray-400">chưa có tài khoản?</span>
+            <span className="text-xs text-gray-400">{t('noAccount')}</span>
             <div className="flex-1 h-px bg-gray-100" />
           </div>
 
@@ -178,11 +182,11 @@ export default function LoginPage() {
             state={{ from }}
             className="w-full flex items-center justify-center py-3.5 border-2 border-primary-500 rounded-2xl text-primary-500 text-sm font-bold hover:bg-primary-50 active:bg-primary-100 transition-colors"
           >
-            Đăng ký tài khoản mới
+            {t('registerNewAccount')}
           </Link>
 
           <div className="text-center mt-5">
-            <Link to="/" className="text-xs text-gray-400 underline">Tiếp tục không đăng nhập</Link>
+            <Link to="/" className="text-xs text-gray-400 underline">{t('continueWithoutLogin')}</Link>
           </div>
         </div>
       </div>

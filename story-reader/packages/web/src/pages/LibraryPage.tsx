@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, Heart, CheckCircle2, BookMarked, Trash2, ChevronRight, MoreHorizontal } from 'lucide-react';
-import { mockStories, formatDate, formatNumber } from '@story-reader/shared';
+import { mockStories, formatDate, formatNumber, translate, type TranslationKey } from '@story-reader/shared';
 import type { ShelfStatus } from '@story-reader/shared';
 import { useStore } from '../store/useStore';
 import Layout from '../components/layout/Layout';
@@ -9,47 +9,26 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 type Tab = 'reading' | 'completed' | 'favorites';
 
-const TABS: { id: Tab; label: string; icon: typeof BookOpen; emptyIcon: string; emptyMsg: string; emptyDesc: string }[] = [
-  {
-    id: 'reading',
-    label: 'Đang đọc',
-    icon: BookOpen,
-    emptyIcon: '📖',
-    emptyMsg: 'Chưa có truyện đang đọc',
-    emptyDesc: 'Mở một truyện và bắt đầu đọc để thêm vào đây',
-  },
-  {
-    id: 'completed',
-    label: 'Đã đọc',
-    icon: CheckCircle2,
-    emptyIcon: '✅',
-    emptyMsg: 'Chưa có truyện hoàn thành',
-    emptyDesc: 'Đánh dấu truyện đã đọc xong để lưu vào đây',
-  },
-  {
-    id: 'favorites',
-    label: 'Yêu thích',
-    icon: Heart,
-    emptyIcon: '❤️',
-    emptyMsg: 'Chưa có truyện yêu thích',
-    emptyDesc: 'Nhấn ❤️ trên trang truyện để thêm vào đây',
-  },
-];
+// TABS are defined inside component so they can use translations via t()
 
 function ShelfStatusBadge({ status }: { status: ShelfStatus }) {
+  const lang = useStore.getState().readerSettings.language;
   const map: Record<ShelfStatus, { label: string; cls: string }> = {
-    reading: { label: 'Đang đọc', cls: 'text-blue-600 bg-blue-50' },
-    completed: { label: 'Đã đọc', cls: 'text-green-600 bg-green-50' },
-    want_to_read: { label: 'Muốn đọc', cls: 'text-purple-600 bg-purple-50' },
+    reading: { label: translate(lang, 'reading'), cls: 'text-blue-600 bg-blue-50' },
+    completed: { label: translate(lang, 'completed'), cls: 'text-green-600 bg-green-50' },
+    want_to_read: { label: translate(lang, 'reading'), cls: 'text-purple-600 bg-purple-50' },
   };
   const { label, cls } = map[status];
   return <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${cls}`}>{label}</span>;
 }
 
 export default function LibraryPage() {
+  const { readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
+
   useDocumentMeta({
-    title: 'Thu vien',
-    description: 'Quan ly truyen dang doc, da doc va yeu thich cua ban.',
+    title: t('libraryTitle'),
+    description: t('libraryDescription'),
   });
 
   const navigate = useNavigate();
@@ -58,6 +37,12 @@ export default function LibraryPage() {
     bookmarks, removeBookmark,
     shelf, removeFromShelf, updateShelfStatus, getProgress,
   } = useStore();
+
+  const TABS = [
+    { id: 'reading' as Tab, label: t('reading'), icon: BookOpen, emptyIcon: '📖', emptyMsg: t('emptyReadingMsg'), emptyDesc: t('emptyReadingDesc') },
+    { id: 'completed' as Tab, label: t('completed'), icon: CheckCircle2, emptyIcon: '✅', emptyMsg: t('emptyCompletedMsg'), emptyDesc: t('emptyCompletedDesc') },
+    { id: 'favorites' as Tab, label: t('favorites'), icon: Heart, emptyIcon: '❤️', emptyMsg: t('emptyFavoritesMsg'), emptyDesc: t('emptyFavoritesDesc') },
+  ];
 
   const readingEntries = shelf
     .filter((e) => e.status === 'reading')
@@ -76,7 +61,7 @@ export default function LibraryPage() {
   };
 
   return (
-    <Layout title="Tủ Truyện">
+    <Layout title={t('libraryTitle')}>
       {/* Tabs */}
       <div className="flex border-b border-gray-100 bg-white sticky top-14 z-30">
         {TABS.map(({ id, label, icon: Icon }) => (
@@ -100,11 +85,11 @@ export default function LibraryPage() {
 
       {/* Đang đọc */}
       {activeTab === 'reading' && (
-        <div className="px-4 pt-4 pb-4">
+        <div className="px-4 lg:px-8 pt-4 pb-4 max-w-screen-xl">
           {readingEntries.length === 0 ? (
             <EmptyState tab={TABS[0]} />
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
               {readingEntries.map((entry) => {
                 const story = mockStories.find((s) => s.id === entry.storyId);
                 if (!story) return null;
@@ -129,18 +114,18 @@ export default function LibraryPage() {
                           <div className="flex items-center gap-1.5 mt-2">
                             <BookOpen size={12} className="text-primary-500" />
                             <span className="text-xs text-primary-500 font-semibold">
-                              Chương {progress.chapterNumber}
-                            </span>
+                                  {t('chapter')} {progress.chapterNumber}
+                                </span>
                             <span className="text-xs text-gray-400">/ {formatNumber(story.totalChapters)}</span>
                           </div>
                         ) : (
-                          <p className="text-xs text-gray-400 mt-2">Chưa bắt đầu đọc</p>
+                          <p className="text-xs text-gray-400 mt-2">{t('notStarted')}</p>
                         )}
 
                         {/* Progress bar */}
                         <div className="mt-2 mb-1">
                           <div className="flex justify-between text-[10px] text-gray-400 mb-1">
-                            <span>{pct}% hoàn thành</span>
+                            <span>{pct}% {t('percentCompleteSuffix')}</span>
                             <span>{formatDate(entry.lastUpdated)}</span>
                           </div>
                           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -160,7 +145,7 @@ export default function LibraryPage() {
                         className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold text-primary-500 active:bg-primary-50"
                       >
                         <BookOpen size={13} />
-                        {progress ? 'Đọc tiếp' : 'Bắt đầu đọc'}
+                        {progress ? t('continueReading') : t('startReading')}
                       </button>
                       <div className="w-px bg-gray-50" />
                       <button
@@ -168,7 +153,7 @@ export default function LibraryPage() {
                         className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold text-green-600 active:bg-green-50"
                       >
                         <CheckCircle2 size={13} />
-                        Đánh dấu xong
+                        {t('markCompleted')}
                       </button>
                       <div className="w-px bg-gray-50" />
                       <button
@@ -188,11 +173,11 @@ export default function LibraryPage() {
 
       {/* Đã đọc */}
       {activeTab === 'completed' && (
-        <div className="px-4 pt-4 pb-4">
+        <div className="px-4 lg:px-8 pt-4 pb-4 max-w-screen-xl">
           {completedEntries.length === 0 ? (
             <EmptyState tab={TABS[1]} />
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
               {completedEntries.map((entry) => {
                 const story = mockStories.find((s) => s.id === entry.storyId);
                 if (!story) return null;
@@ -218,12 +203,12 @@ export default function LibraryPage() {
                       <p className="text-xs text-gray-500 mt-0.5">{story.author}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <span className="text-xs text-gray-400">
-                          {formatNumber(story.totalChapters)} chương
+                          {formatNumber(story.totalChapters)} {t('chapter')}
                         </span>
                         {entry.completedAt && (
                           <>
                             <span className="text-gray-200">·</span>
-                            <span className="text-xs text-gray-400">Xong {formatDate(entry.completedAt)}</span>
+                            <span className="text-xs text-gray-400">{t('doneAt')} {formatDate(entry.completedAt)}</span>
                           </>
                         )}
                       </div>
@@ -232,13 +217,13 @@ export default function LibraryPage() {
                           onClick={(e) => { e.preventDefault(); updateShelfStatus(story.id, 'reading'); }}
                           className="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full font-medium"
                         >
-                          Đọc lại
+                          {t('readAgain')}
                         </button>
                         <button
                           onClick={(e) => { e.preventDefault(); removeFromShelf(story.id); }}
                           className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full"
                         >
-                          Xóa
+                          {t('delete')}
                         </button>
                       </div>
                     </div>
@@ -252,11 +237,11 @@ export default function LibraryPage() {
 
       {/* Yêu thích */}
       {activeTab === 'favorites' && (
-        <div className="px-4 pt-4 pb-4">
+        <div className="px-4 lg:px-8 pt-4 pb-4 max-w-screen-xl">
           {favoriteStories.length === 0 ? (
             <EmptyState tab={TABS[2]} />
           ) : (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
               {favoriteStories.map((story) => {
                 const entry = shelf.find((e) => e.storyId === story.id);
                 return (
@@ -294,14 +279,15 @@ export default function LibraryPage() {
   );
 }
 
-function EmptyState({ tab }: { tab: (typeof TABS)[number] }) {
+function EmptyState({ tab }: { tab: { emptyIcon: string; emptyMsg: string; emptyDesc: string } }) {
+  const lang = useStore.getState().readerSettings.language;
   return (
     <div className="flex flex-col items-center justify-center py-20 text-gray-400">
       <span className="text-5xl mb-4">{tab.emptyIcon}</span>
       <p className="text-sm font-medium text-gray-500">{tab.emptyMsg}</p>
       <p className="text-xs text-gray-400 mt-1 text-center px-8">{tab.emptyDesc}</p>
       <Link to="/browse" className="btn-primary mt-6 inline-block">
-        Khám phá truyện
+        {translate(lang, 'browse')}
       </Link>
     </div>
   );

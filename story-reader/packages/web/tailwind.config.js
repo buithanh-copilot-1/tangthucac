@@ -13,11 +13,6 @@ export default {
           600: '#dc2626',
           700: '#b91c1c',
         },
-        sepia: {
-          50: '#fdf8f0',
-          100: '#f5e6c8',
-          900: '#3d2b1f',
-        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

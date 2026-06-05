@@ -121,7 +121,7 @@ export default function SearchPage() {
 
       {/* Landing — recents, hot, genres */}
       {showLanding && (
-        <div className="px-4 pt-4">
+        <div className="px-4 lg:px-8 pt-4 max-w-screen-xl">
           {recentSearches.length > 0 && (
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
@@ -158,7 +158,7 @@ export default function SearchPage() {
 
           <div>
             <p className="text-sm font-semibold text-gray-900 mb-3">Theo thể loại</p>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-4 xl:grid-cols-6 gap-2">
               {categories.map((cat) => (
                 <button key={cat.id} onClick={() => setActiveGenre(cat.id)}
                   className="flex flex-col items-center gap-1 p-2 bg-white border border-gray-100 rounded-xl text-center active:bg-gray-50">
@@ -173,7 +173,7 @@ export default function SearchPage() {
 
       {/* Results */}
       {searched && (
-        <div className="px-4 pt-4 pb-4">
+        <div className="px-4 lg:px-8 pt-4 pb-4 max-w-screen-xl">
           {activeGenre && (
             <div className="flex items-center gap-2 mb-3">
               <button onClick={() => setActiveGenre(null)}
@@ -192,7 +192,7 @@ export default function SearchPage() {
                 {results.length} kết quả {query ? `cho "${query}"` : ''}
               </p>
               {results.length > 0 ? (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 max-w-3xl">
                   {results.map((story) => (
                     <StoryCard key={story.id} story={story} variant="list" highlightQuery={query} />
                   ))}

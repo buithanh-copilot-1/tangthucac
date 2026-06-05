@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, BookOpen, CheckCircle2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { translate, type TranslationKey } from '@story-reader/shared';
 import { useToast } from '../store/useToast';
 import GoogleIcon from '../components/auth/GoogleIcon';
 import { useGoogleAuth } from '../components/auth/useGoogleAuth';
@@ -14,33 +15,16 @@ interface FieldError {
   confirm?: string;
 }
 
-function validate(username: string, email: string, password: string, confirm: string): FieldError {
-  const errs: FieldError = {};
-  if (!username.trim()) errs.username = 'Vui lòng nhập tên người dùng';
-  else if (username.trim().length < 3) errs.username = 'Tên phải ít nhất 3 ký tự';
-  else if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) errs.username = 'Chỉ gồm chữ, số và dấu _';
-
-  if (!email.trim()) errs.email = 'Vui lòng nhập email';
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errs.email = 'Email không hợp lệ';
-
-  if (!password) errs.password = 'Vui lòng nhập mật khẩu';
-  else if (password.length < 6) errs.password = 'Mật khẩu ít nhất 6 ký tự';
-
-  if (!confirm) errs.confirm = 'Vui lòng xác nhận mật khẩu';
-  else if (password !== confirm) errs.confirm = 'Mật khẩu xác nhận không khớp';
-
-  return errs;
-}
-
 export default function RegisterPage() {
-  useDocumentMeta({
-    title: 'Dang ky',
-    description: 'Tao tai khoan TruyenHay de luu truyen yeu thich va tien do doc.',
-  });
-
   const navigate = useNavigate();
   const location = useLocation();
-  const { register } = useStore();
+  const { register, readerSettings } = useStore();
+  const t = (k: TranslationKey) => translate(readerSettings.language, k);
+
+  useDocumentMeta({
+    title: t('registerNewAccount'),
+    description: t('registerPrompt'),
+  });
 
   const from = (location.state as { from?: string })?.from ?? '/';
 
@@ -52,9 +36,27 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const google = useGoogleAuth(() => {
-    toast.success('Đăng ký và đăng nhập Google thành công!');
+    toast.success(t('googleLoginSuccess'));
     navigate(from, { replace: true });
   });
+
+  function validate(username: string, email: string, password: string, confirm: string): FieldError {
+    const errs: FieldError = {};
+    if (!username.trim()) errs.username = t('usernameRequired');
+    else if (username.trim().length < 3) errs.username = t('usernameTooShort');
+    else if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) errs.username = t('usernameInvalid');
+
+    if (!email.trim()) errs.email = t('emailRequired');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errs.email = t('emailInvalid');
+
+    if (!password) errs.password = t('passwordRequired');
+    else if (password.length < 6) errs.password = t('passwordTooShort');
+
+    if (!confirm) errs.confirm = t('confirmRequired');
+    else if (password !== confirm) errs.confirm = t('passwordConfirmMismatch');
+
+    return errs;
+  }
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -72,10 +74,10 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (result.success) {
-      toast.success('Tạo tài khoản thành công! Chào mừng bạn.');
+      toast.success(t('registerSuccess'));
       navigate(from, { replace: true });
     } else {
-      setServerError(result.error ?? 'Đăng ký thất bại');
+      setServerError(result.error ?? t('registerFailed'));
     }
   };
 
@@ -98,15 +100,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center">
-      <div className="w-full max-w-mobile flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex justify-center items-start sm:items-center">
+      <div className="w-full max-w-md flex flex-col sm:shadow-xl sm:rounded-3xl sm:overflow-hidden">
         {/* Top gradient */}
         <div className="bg-gradient-to-br from-primary-500 to-primary-700 pt-14 pb-10 px-6 flex flex-col items-center">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
             <BookOpen size={32} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Tạo tài khoản</h1>
-          <p className="text-primary-100 text-sm mt-1">Đăng ký để lưu tiến độ đọc của bạn</p>
+          <h1 className="text-2xl font-bold text-white">{t('registerNewAccount')}</h1>
+          <p className="text-primary-100 text-sm mt-1">{t('registerPrompt')}</p>
         </div>
 
         {/* Form card */}
@@ -128,12 +130,12 @@ export default function RegisterPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                <span className="text-sm font-medium text-gray-600">Đang xử lý...</span>
+                <span className="text-sm font-medium text-gray-600">{t('processing')}</span>
               </>
             ) : (
               <>
                 <GoogleIcon size={20} />
-                <span className="text-sm font-medium text-gray-700">Đăng ký bằng Google</span>
+                <span className="text-sm font-medium text-gray-700">{t('continueWithGoogle')}</span>
               </>
             )}
           </button>
@@ -146,14 +148,14 @@ export default function RegisterPage() {
 
           <div className="flex items-center gap-3 my-4">
             <div className="flex-1 h-px bg-gray-100" />
-            <span className="text-xs text-gray-400">hoặc đăng ký bằng email</span>
+            <span className="text-xs text-gray-400">{t('orSignInWithEmail')}</span>
             <div className="flex-1 h-px bg-gray-100" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
             <Field
-              label="Tên người dùng"
+              label={t('username')}
               icon={<User size={17} className="text-gray-400" />}
               error={fieldErrors.username}
             >
@@ -169,7 +171,7 @@ export default function RegisterPage() {
 
             {/* Email */}
             <Field
-              label="Email"
+              label={t('email')}
               icon={<Mail size={17} className="text-gray-400" />}
               error={fieldErrors.email}
             >
@@ -185,7 +187,7 @@ export default function RegisterPage() {
 
             {/* Password */}
             <Field
-              label="Mật khẩu"
+              label={t('password')}
               icon={<Lock size={17} className="text-gray-400" />}
               error={fieldErrors.password}
               suffix={
@@ -207,7 +209,7 @@ export default function RegisterPage() {
 
             {/* Confirm password */}
             <Field
-              label="Xác nhận mật khẩu"
+              label={t('confirmNewPassword')}
               icon={
                 form.confirm && form.confirm === form.password
                   ? <CheckCircle2 size={17} className="text-green-500" />
@@ -245,9 +247,9 @@ export default function RegisterPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Đang tạo tài khoản...
+                  {t('processing')}
                 </span>
-              ) : 'Đăng ký'}
+              ) : t('register')}
             </button>
           </form>
 
@@ -261,12 +263,12 @@ export default function RegisterPage() {
           <p className="text-center text-sm text-gray-500">
             Đã có tài khoản?{' '}
             <Link to="/login" state={{ from }} className="text-primary-500 font-semibold">
-              Đăng nhập
+              {t('login')}
             </Link>
           </p>
           <div className="text-center mt-4">
             <Link to="/" className="text-xs text-gray-400 underline">
-              Tiếp tục không đăng nhập
+              {t('continueWithoutLogin')}
             </Link>
           </div>
         </div>

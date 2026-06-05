@@ -3,11 +3,16 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Mail } from 'lucide-react';
 import { authApi } from '../services/auth.api';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
+import { useStore } from '../store/useStore';
+import { translate, type TranslationKey } from '@story-reader/shared';
 
 export default function ForgotPasswordPage() {
+  const { readerSettings } = useStore();
+  const t = (key: TranslationKey) => translate(readerSettings.language, key);
+
   useDocumentMeta({
-    title: 'Quen mat khau',
-    description: 'Tao yeu cau dat lai mat khau tai khoan TruyenHay.',
+    title: t('resetPassword'),
+    description: t('resetPasswordPrompt'),
   });
 
   const [email, setEmail] = useState('');
@@ -27,21 +32,21 @@ export default function ForgotPasswordPage() {
       setMessage(res.message);
       if (res.resetToken) setResetToken(res.resetToken);
     } catch (err: any) {
-      setError(err?.message ?? 'Khong tao duoc yeu cau dat lai mat khau');
+      setError(err?.message ?? t('resetRequestFailed'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center">
-      <div className="w-full max-w-mobile flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex justify-center items-start sm:items-center">
+      <div className="w-full max-w-md flex flex-col sm:shadow-xl sm:rounded-3xl sm:overflow-hidden">
         <div className="bg-gradient-to-br from-primary-500 to-primary-700 pt-16 pb-12 px-6 flex flex-col items-center">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
             <BookOpen size={32} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Quen mat khau</h1>
-          <p className="text-primary-100 text-sm mt-1 text-center">Nhap email de tao yeu cau dat lai mat khau</p>
+          <h1 className="text-2xl font-bold text-white">{t('resetPassword')}</h1>
+          <p className="text-primary-100 text-sm mt-1 text-center">{t('resetPasswordPrompt')}</p>
         </div>
 
         <div className="flex-1 bg-white rounded-t-3xl -mt-6 px-6 pt-8 pb-8">
@@ -73,7 +78,7 @@ export default function ForgotPasswordPage() {
                   to={`/reset-password?token=${encodeURIComponent(resetToken)}`}
                   className="mt-3 inline-flex text-sm font-semibold text-primary-600"
                 >
-                  Dat lai mat khau bang token nay
+                    {t('resetUsingToken')}
                 </Link>
               </div>
             )}
@@ -83,12 +88,12 @@ export default function ForgotPasswordPage() {
               disabled={loading}
               className="w-full bg-primary-500 text-white font-bold py-4 rounded-2xl text-sm active:bg-primary-600 disabled:opacity-60"
             >
-              {loading ? 'Dang xu ly...' : 'Gui yeu cau'}
+              {loading ? t('processing') : t('sendRequest')}
             </button>
           </form>
 
           <div className="mt-5 text-center">
-            <Link to="/login" className="text-sm font-semibold text-primary-500">Quay lai dang nhap</Link>
+            <Link to="/login" className="text-sm font-semibold text-primary-500">{t('backToLogin')}</Link>
           </div>
         </div>
       </div>

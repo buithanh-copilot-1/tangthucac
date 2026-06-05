@@ -10,6 +10,11 @@ export type Genre =
 
 export type StoryStatus = 'ongoing' | 'completed' | 'hiatus';
 
+export type Language = 'vi' | 'en';
+
+export type ReaderTheme = 'light' | 'dark';
+export type ReaderBackground = 'default' | 'sepia' | 'black';
+
 export interface Story {
   id: string;
   title: string;
@@ -56,9 +61,12 @@ export interface ReadingProgress {
 
 export interface ReaderSettings {
   fontSize: 'sm' | 'md' | 'lg' | 'xl';
-  theme: 'light' | 'sepia' | 'dark';
+  theme: ReaderTheme;
+  /** Separate reading background (not the app UI theme) */
+  background: ReaderBackground;
   lineHeight: 'normal' | 'relaxed' | 'loose';
   fontFamily: 'sans' | 'serif';
+  language: Language;
 }
 
 export interface SearchResult {

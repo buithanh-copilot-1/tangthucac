@@ -5,8 +5,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import type { NativeStackNavigationProp, RouteProp } from '@react-navigation/native-stack';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { mockStories, getChapter, getChapters } from '@story-reader/shared';
 import { useStore } from '../store/useStore';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -18,8 +18,12 @@ const FONT_SIZES = { sm: 13, md: 15, lg: 17, xl: 19 };
 const LINE_HEIGHTS = { normal: 22, relaxed: 26, loose: 32 };
 const THEMES = {
   light: { bg: '#fff', text: '#1e293b', header: '#fff', headerBorder: '#f1f5f9', sub: '#64748b' },
-  sepia: { bg: '#fdf6e3', text: '#3d2b1f', header: '#fdf0d0', headerBorder: '#e8d5b5', sub: '#78614a' },
   dark: { bg: '#1e293b', text: '#e2e8f0', header: '#0f172a', headerBorder: '#334155', sub: '#64748b' },
+};
+const BG_MAP = {
+  default: '#fff',
+  sepia: '#f4ecd8',
+  black: '#1e293b',
 };
 
 export default function ChapterScreen() {
@@ -35,7 +39,9 @@ export default function ChapterScreen() {
   const allChapters = story ? getChapters(story.id) : [];
   const hasPrev = chapterNum > 1;
   const hasNext = chapterNum < allChapters.length;
-  const theme = THEMES[readerSettings.theme];
+  const baseTheme = THEMES[readerSettings.theme];
+  const backgroundColor = BG_MAP[readerSettings.background];
+  const theme = { ...baseTheme, bg: backgroundColor };
 
   useEffect(() => {
     if (!story || !chapter) return;

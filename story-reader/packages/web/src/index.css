@@ -16,6 +16,57 @@
     overscroll-behavior: none;
   }
 
+  html[data-theme='dark'] {
+    --app-bg: #0f172a;
+    --app-surface: #111827;
+    --app-surface-muted: #1f2937;
+    --app-text: #f3f4f6;
+    --app-text-muted: #9ca3af;
+    --app-border: #334155;
+  }
+
+  html[data-theme='dark'] body {
+    background-color: var(--app-bg);
+    color: var(--app-text);
+  }
+
+  html[data-theme='dark'] .bg-gray-50 {
+    background-color: var(--app-bg) !important;
+  }
+
+  html[data-theme='dark'] .bg-white {
+    background-color: var(--app-surface) !important;
+  }
+
+  html[data-theme='dark'] .bg-gray-100,
+  html[data-theme='dark'] .bg-gray-200 {
+    background-color: var(--app-surface-muted) !important;
+  }
+
+  html[data-theme='dark'] .text-gray-900,
+  html[data-theme='dark'] .text-gray-800,
+  html[data-theme='dark'] .text-gray-700 {
+    color: var(--app-text) !important;
+  }
+
+  html[data-theme='dark'] .text-gray-600,
+  html[data-theme='dark'] .text-gray-500,
+  html[data-theme='dark'] .text-gray-400 {
+    color: var(--app-text-muted) !important;
+  }
+
+  html[data-theme='dark'] .border-gray-50,
+  html[data-theme='dark'] .border-gray-100,
+  html[data-theme='dark'] .border-gray-200,
+  html[data-theme='dark'] .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--app-border) !important;
+  }
+
+  html[data-theme='dark'] .shadow-sm,
+  html[data-theme='dark'] .shadow-xl {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24) !important;
+  }
+
   ::-webkit-scrollbar {
     width: 4px;
     height: 4px;
@@ -32,17 +83,17 @@
 
 @layer components {
   .story-card-hover {
-    @apply transition-transform duration-200 active:scale-95;
+    @apply transition-transform duration-200 active:scale-95 hover:scale-[1.03];
   }
 
   .btn-primary {
     @apply bg-primary-500 text-white rounded-full px-6 py-3 font-semibold text-sm
-           active:bg-primary-600 transition-colors duration-150 select-none;
+           hover:bg-primary-600 active:bg-primary-700 transition-colors duration-150 select-none;
   }
 
   .btn-secondary {
     @apply bg-white text-primary-500 border border-primary-500 rounded-full px-6 py-3
-           font-semibold text-sm active:bg-gray-50 transition-colors duration-150 select-none;
+           font-semibold text-sm hover:bg-primary-50 active:bg-gray-50 transition-colors duration-150 select-none;
   }
 
   .safe-bottom {
@@ -53,11 +104,6 @@
 /* Reader themes */
 .reader-light {
   @apply bg-white text-gray-900;
-}
-
-.reader-sepia {
-  background-color: #fdf6e3;
-  color: #3d2b1f;
 }
 
 .reader-dark {

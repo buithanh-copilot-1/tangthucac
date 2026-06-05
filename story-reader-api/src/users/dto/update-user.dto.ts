@@ -23,9 +23,9 @@ export class UpdateSettingsDto {
   @IsEnum(['sm', 'md', 'lg', 'xl'])
   fontSize?: string;
 
-  @ApiPropertyOptional({ enum: ['light', 'sepia', 'dark'] })
+  @ApiPropertyOptional({ enum: ['light', 'dark'] })
   @IsOptional()
-  @IsEnum(['light', 'sepia', 'dark'])
+  @IsEnum(['light', 'dark'])
   theme?: string;
 
   @ApiPropertyOptional({ enum: ['normal', 'relaxed', 'loose'] })
@@ -37,4 +37,9 @@ export class UpdateSettingsDto {
   @IsOptional()
   @IsEnum(['sans', 'serif'])
   fontFamily?: string;
+
+  @ApiPropertyOptional({ enum: ['vi', 'en'] })
+  @IsOptional()
+  @IsEnum(['vi', 'en'])
+  language?: string;
 }

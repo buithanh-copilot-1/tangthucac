@@ -68,7 +68,7 @@ export default function BrowsePage() {
     <Layout title="Khám Phá" showBack={false}>
       {/* Genre chips */}
       <div className="sticky top-14 z-30 bg-white border-b border-gray-100 px-0 py-3">
-        <div className="flex gap-2 px-4 overflow-x-auto no-scrollbar">
+        <div className="flex gap-2 px-4 lg:px-6 overflow-x-auto no-scrollbar lg:flex-wrap">
           <button
             onClick={() => handleGenre(null)}
             className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all
@@ -83,7 +83,7 @@ export default function BrowsePage() {
       </div>
 
       {/* Controls bar */}
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between px-4 lg:px-6 py-3">
         <span className="text-sm text-gray-500">{total} truyện</span>
         <div className="flex items-center gap-2">
           <button
@@ -105,7 +105,7 @@ export default function BrowsePage() {
 
       {/* Filter panel */}
       {showFilters && (
-        <div className="mx-4 mb-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="mx-4 lg:mx-6 mb-3 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
           <div className="mb-3">
             <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Sắp xếp</p>
             <div className="flex flex-wrap gap-2">
@@ -140,7 +140,7 @@ export default function BrowsePage() {
       )}
 
       {/* Stories grid/list */}
-      <div className="px-4 pb-24">
+      <div className="px-4 lg:px-6 pb-24 lg:pb-10 max-w-screen-2xl">
         {loading && stories.length === 0 ? (
           <div className="flex justify-center py-16">
             <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full" />
@@ -148,11 +148,11 @@ export default function BrowsePage() {
         ) : stories.length === 0 ? (
           <div className="text-center py-16 text-gray-400">Không tìm thấy truyện</div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4">
             {stories.map((s) => <StoryCard key={s.id} story={s} />)}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 max-w-3xl">
             {stories.map((s) => <StoryCard key={s.id} story={s} variant="horizontal" />)}
           </div>
         )}

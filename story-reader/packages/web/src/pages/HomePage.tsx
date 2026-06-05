@@ -55,7 +55,7 @@ export default function HomePage() {
     <Layout>
       {/* Hero Banner */}
       {banner && (
-        <div className="relative overflow-hidden" style={{ height: 220 }}>
+        <div className="relative overflow-hidden h-48 md:h-64 lg:h-80">
           <img src={banner.cover} alt={banner.title} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -78,11 +78,11 @@ export default function HomePage() {
         </div>
       )}
 
-      <div className="px-4 pt-4 pb-24 space-y-6">
+      <div className="px-4 md:px-6 lg:px-8 pt-4 pb-24 lg:pb-10 space-y-6 max-w-screen-2xl">
         {/* Categories */}
         <div>
           <SectionHeader title="Thể Loại" />
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pt-2">
+          <div className="flex flex-wrap gap-2 pt-2">
             {categories.map((cat) => (
               <CategoryBadge key={cat.id} category={cat} asLink />
             ))}
@@ -93,8 +93,12 @@ export default function HomePage() {
         {hot.length > 0 && (
           <div>
             <SectionHeader title="Đang Hot" viewAllTo="/browse?sort=views" />
-            <div className="flex gap-3 overflow-x-auto no-scrollbar pt-2">
+            {/* Mobile: horizontal scroll; Desktop: grid */}
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pt-2 lg:hidden">
               {hot.map((s) => <StoryCard key={s.id} story={s} variant="horizontal" />)}
+            </div>
+            <div className="hidden lg:grid grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 pt-2">
+              {hot.slice(0, 6).map((s) => <StoryCard key={s.id} story={s} />)}
             </div>
           </div>
         )}
@@ -103,7 +107,7 @@ export default function HomePage() {
         {recent.length > 0 && (
           <div>
             <SectionHeader title="Mới Cập Nhật" viewAllTo="/browse" />
-            <div className="grid grid-cols-3 gap-3 pt-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 md:gap-4 pt-2">
               {recent.map((s) => <StoryCard key={s.id} story={s} />)}
             </div>
           </div>

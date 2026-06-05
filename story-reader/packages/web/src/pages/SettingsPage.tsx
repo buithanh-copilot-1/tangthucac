@@ -8,9 +8,11 @@ import {
   Info,
   KeyRound,
   LogOut,
+  Palette,
   Trash2,
   X,
 } from 'lucide-react';
+import { languages, readerThemes, translate, type TranslationKey } from '@story-reader/shared';
 import { useStore } from '../store/useStore';
 import { useToast } from '../store/useToast';
 import Layout from '../components/layout/Layout';
@@ -19,11 +21,6 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 const AVATAR_COLORS = ['bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500', 'bg-pink-500'];
 
 export default function SettingsPage() {
-  useDocumentMeta({
-    title: 'Cai dat',
-    description: 'Quan ly tai khoan, mat khau va du lieu doc truyen.',
-  });
-
   const navigate = useNavigate();
   const toast = useToast();
   const {
@@ -35,7 +32,17 @@ export default function SettingsPage() {
     clearRecentSearches,
     bookmarks,
     shelf,
+    readerSettings,
+    updateReaderSettings,
+    appTheme,
+    setAppTheme,
   } = useStore();
+  const t = (key: TranslationKey) => translate(readerSettings.language, key);
+
+  useDocumentMeta({
+    title: t('settingsTitle'),
+    description: t('settingsDescription'),
+  });
 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(currentUser?.username ?? '');
@@ -57,15 +64,15 @@ export default function SettingsPage() {
   const handleSaveName = () => {
     const trimmed = nameInput.trim();
     if (!trimmed) {
-      setNameError('Ten khong duoc de trong');
+      setNameError(t('usernameRequired'));
       return;
     }
     if (trimmed.length < 3) {
-      setNameError('It nhat 3 ky tu');
+      setNameError(t('usernameTooShort'));
       return;
     }
     if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
-      setNameError('Chi dung chu, so va _');
+      setNameError(t('usernameInvalid'));
       return;
     }
     updateProfile({ username: trimmed });
@@ -77,11 +84,11 @@ export default function SettingsPage() {
     e.preventDefault();
     setPasswordError('');
     if (passwordForm.next.length < 6) {
-      setPasswordError('Mat khau moi phai it nhat 6 ky tu');
+      setPasswordError(t('passwordTooShort'));
       return;
     }
     if (passwordForm.next !== passwordForm.confirm) {
-      setPasswordError('Xac nhan mat khau khong khop');
+      setPasswordError(t('passwordConfirmMismatch'));
       return;
     }
 
@@ -90,21 +97,21 @@ export default function SettingsPage() {
     setPasswordLoading(false);
 
     if (result.success) {
-      toast.success('Da doi mat khau. Vui long dang nhap lai.');
+      toast.success(t('passwordChanged'));
       navigate('/login', { replace: true });
       return;
     }
-    setPasswordError(result.error ?? 'Doi mat khau that bai');
+    setPasswordError(result.error ?? t('passwordChangeFailed'));
   };
 
   const handleLogout = async () => {
     await logout();
-    toast.info('Ban da dang xuat.');
+    toast.info(t('loggedOut'));
     navigate('/');
   };
 
   return (
-    <Layout title="Cai Dat">
+    <Layout title={t('settingsTitle')}>
       <div className="px-4 pt-4 pb-8 space-y-5">
         {currentUser ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -187,14 +194,14 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-2 mt-1">
                   {provider === 'google' ? (
                     <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#4285F4] bg-blue-50 px-2 py-0.5 rounded-full">
-                      <span className="font-bold">G</span> Google Account
+                      <span className="font-bold">G</span> {t('googleInfo')}
                     </span>
                   ) : (
                     <span className="text-[10px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                      Email
+                      {t('email')}
                     </span>
                   )}
-                  <p className="text-[10px] text-gray-400">Tham gia {joinedDate}</p>
+                  <p className="text-[10px] text-gray-400">{t('joined')} {joinedDate}</p>
                 </div>
               </div>
             </div>
@@ -212,13 +219,13 @@ export default function SettingsPage() {
                 </div>
                 <div className="divide-y divide-[#e8eeff]">
                   {[
-                    { label: 'Ho va ten', value: currentUser.displayName },
-                    { label: 'Ho', value: currentUser.familyName },
-                    { label: 'Ten', value: currentUser.givenName },
-                    { label: 'Email', value: currentUser.email },
-                    { label: 'Google ID', value: currentUser.googleId },
+                    { label: t('fullName'), value: currentUser.displayName },
+                    { label: t('familyName'), value: currentUser.familyName },
+                    { label: t('givenName'), value: currentUser.givenName },
+                    { label: t('email'), value: currentUser.email },
+                    { label: t('googleId'), value: currentUser.googleId },
                   ].filter((row) => row.value).map(({ label, value }) => (
-                    <div key={label} className="flex items-center justify-between px-4 py-2.5">
+                    <div key={label as string} className="flex items-center justify-between px-4 py-2.5">
                       <span className="text-xs text-gray-500 w-24 flex-shrink-0">{label}</span>
                       <span className="text-xs font-medium text-gray-900 truncate text-right">{value}</span>
                     </div>
@@ -229,9 +236,9 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-3 border-t border-gray-50">
               {[
-                { label: 'Yeu thich', value: bookmarks.length, color: 'text-primary-500' },
-                { label: 'Dang doc', value: shelf.filter((entry) => entry.status === 'reading').length, color: 'text-blue-500' },
-                { label: 'Da doc', value: shelf.filter((entry) => entry.status === 'completed').length, color: 'text-green-500' },
+                { label: t('favorites'), value: bookmarks.length, color: 'text-primary-500' },
+                { label: t('reading'), value: shelf.filter((entry) => entry.status === 'reading').length, color: 'text-blue-500' },
+                { label: t('completed'), value: shelf.filter((entry) => entry.status === 'completed').length, color: 'text-green-500' },
               ].map(({ label, value, color }) => (
                 <div key={label} className="flex flex-col items-center py-3 border-r border-gray-50 last:border-0">
                   <p className={`text-xl font-bold ${color}`}>{value}</p>
@@ -247,22 +254,22 @@ export default function SettingsPage() {
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-red-500 active:bg-red-50"
               >
                 <LogOut size={17} />
-                <span className="text-sm font-medium">Dang xuat</span>
+                <span className="text-sm font-medium">{t('logout')}</span>
               </button>
             </div>
           </div>
         ) : (
           <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl p-5 border border-primary-100">
-            <p className="text-base font-bold text-gray-900 mb-1">Chua dang nhap</p>
+            <p className="text-base font-bold text-gray-900 mb-1">{t('notLoggedIn')}</p>
             <p className="text-xs text-gray-600 mb-4">
-              Dang nhap de luu tu truyen, tien do doc va dong bo tren nhieu thiet bi.
+              {t('loginPrompt')}
             </p>
             <div className="flex gap-3">
               <Link to="/login" className="flex-1 bg-primary-500 text-white text-sm font-semibold py-2.5 rounded-xl text-center">
-                Dang nhap
+                {t('login')}
               </Link>
               <Link to="/register" className="flex-1 bg-white text-primary-500 border border-primary-300 text-sm font-semibold py-2.5 rounded-xl text-center">
-                Dang ky
+                {t('register')}
               </Link>
             </div>
           </div>
@@ -316,7 +323,7 @@ export default function SettingsPage() {
                     <div className="w-9 h-9 bg-primary-50 rounded-xl flex items-center justify-center">
                       <KeyRound size={18} className="text-primary-500" />
                     </div>
-                    <p className="text-sm font-medium text-gray-900">Doi mat khau</p>
+                    <p className="text-sm font-medium text-gray-900">{t('changePassword')}</p>
                   </div>
                   <ChevronRight size={16} className={`text-gray-400 transition-transform ${showPasswordForm ? 'rotate-90' : ''}`} />
                 </button>
@@ -329,21 +336,21 @@ export default function SettingsPage() {
                           type="password"
                           value={passwordForm.current}
                           onChange={(e) => setPasswordForm((form) => ({ ...form, current: e.target.value }))}
-                          placeholder="Mat khau hien tai"
+                          placeholder={t('currentPassword')}
                           className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary-400"
                         />
                         <input
                           type="password"
                           value={passwordForm.next}
                           onChange={(e) => setPasswordForm((form) => ({ ...form, next: e.target.value }))}
-                          placeholder="Mat khau moi"
+                          placeholder={t('newPassword')}
                           className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary-400"
                         />
                         <input
                           type="password"
                           value={passwordForm.confirm}
                           onChange={(e) => setPasswordForm((form) => ({ ...form, confirm: e.target.value }))}
-                          placeholder="Xac nhan mat khau moi"
+                          placeholder={t('confirmNewPassword')}
                           className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-primary-400"
                         />
                         {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
@@ -352,7 +359,7 @@ export default function SettingsPage() {
                           disabled={passwordLoading}
                           className="w-full rounded-xl bg-gray-900 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
                         >
-                          {passwordLoading ? 'Dang doi...' : 'Doi mat khau'}
+                          {passwordLoading ? t('changingPassword') : t('changePassword')}
                         </button>
                       </form>
                     ) : (
@@ -365,14 +372,59 @@ export default function SettingsPage() {
               </>
             )}
 
-            <div className="flex items-center justify-between px-4 py-4">
+            <div className="flex items-center justify-between px-4 py-4 gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-purple-50 rounded-xl flex items-center justify-center">
                   <Globe size={18} className="text-purple-500" />
                 </div>
-                <p className="text-sm font-medium text-gray-900">Ngon ngu</p>
+                <p className="text-sm font-medium text-gray-900">{t('language')}</p>
               </div>
-              <span className="text-sm text-gray-500">Tieng Viet</span>
+              <div className="flex rounded-xl border border-gray-200 bg-gray-50 p-1">
+                {languages.map((language) => (
+                  <button
+                    key={language.value}
+                    type="button"
+                    onClick={() => updateReaderSettings({ language: language.value })}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      readerSettings.language === language.value
+                        ? 'bg-white text-primary-600 shadow-sm'
+                        : 'text-gray-500'
+                    }`}
+                    title={language.label}
+                  >
+                    {language.shortLabel}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="px-4 py-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-9 h-9 bg-purple-50 rounded-xl flex items-center justify-center">
+                  <Palette size={18} className="text-purple-500" />
+                </div>
+                <p className="text-sm font-medium text-gray-900">{t('theme')}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {readerThemes.map((theme) => (
+                  <button
+                    key={theme.value}
+                    type="button"
+                    onClick={() => setAppTheme(theme.value)}
+                    className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-colors ${
+                      appTheme === theme.value
+                        ? 'border-primary-400 bg-primary-50 text-primary-700'
+                        : 'border-gray-200 text-gray-600'
+                    }`}
+                  >
+                    <span
+                      className="h-4 w-4 rounded-full border border-black/10"
+                      style={{ backgroundColor: theme.swatch }}
+                    />
+                    <span className="truncate">{t(theme.labelKey)}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="flex items-center justify-between px-4 py-4">
@@ -380,7 +432,7 @@ export default function SettingsPage() {
                 <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center">
                   <Info size={18} className="text-gray-500" />
                 </div>
-                <p className="text-sm font-medium text-gray-900">Phien ban</p>
+                <p className="text-sm font-medium text-gray-900">{t('version')}</p>
               </div>
               <span className="text-sm text-gray-500">1.0.0</span>
             </div>

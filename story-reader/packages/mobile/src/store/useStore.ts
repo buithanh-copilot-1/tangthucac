@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { defaultReaderSettings, normalizeReaderSettings } from '@story-reader/shared';
 import type { ReaderSettings, ReadingProgress, Story, ShelfEntry, ShelfStatus, User } from '@story-reader/shared';
 import { authApi, type AuthResponse } from '../services/auth.api';
 import { ApiError } from '../services/api';
@@ -119,8 +120,8 @@ export const useStore = create<AppState>()(
       getProgress: (id) => get().history.find((h) => h.storyId === id),
       clearHistory: () => set({ history: [] }),
 
-      readerSettings: { fontSize: 'md', theme: 'light', lineHeight: 'relaxed', fontFamily: 'sans' },
-      updateReaderSettings: (s) => set((st) => ({ readerSettings: { ...st.readerSettings, ...s } })),
+      readerSettings: defaultReaderSettings,
+      updateReaderSettings: (s) => set((st) => ({ readerSettings: normalizeReaderSettings({ ...st.readerSettings, ...s }) })),
 
       recentSearches: [],
       addRecentSearch: (q) =>
@@ -144,6 +145,14 @@ export const useStore = create<AppState>()(
         recentSearches: s.recentSearches,
         recentlyViewed: s.recentlyViewed,
       }),
+      merge: (persisted, current) => {
+        const state = persisted as Partial<AppState> | undefined;
+        return {
+          ...current,
+          ...state,
+          readerSettings: normalizeReaderSettings(state?.readerSettings),
+        };
+      },
     }
   )
 );

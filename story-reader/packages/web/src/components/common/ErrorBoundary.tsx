@@ -1,5 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { translate, type TranslationKey } from '@story-reader/shared';
+import { useStore } from '../../store/useStore';
 
 interface Props {
   children: ReactNode;
@@ -29,9 +31,9 @@ export default class ErrorBoundary extends Component<Props, State> {
           <div className="w-12 h-12 mx-auto rounded-full bg-red-50 text-red-500 flex items-center justify-center">
             <AlertTriangle size={24} />
           </div>
-          <h1 className="mt-4 text-base font-bold text-gray-900">Co loi hien thi</h1>
+          <h1 className="mt-4 text-base font-bold text-gray-900">{translate(useStore.getState().readerSettings.language, 'errorTitle')}</h1>
           <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-            Trang vua gap loi khi ve giao dien. Ban co the thu tai lai hoac quay ve trang chu.
+            {translate(useStore.getState().readerSettings.language, 'errorDescription')}
           </p>
           <div className="mt-5 grid grid-cols-2 gap-2">
             <button
@@ -40,7 +42,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               className="h-11 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold flex items-center justify-center gap-2"
             >
               <RefreshCw size={15} />
-              Thu lai
+              {translate(useStore.getState().readerSettings.language, 'retry')}
             </button>
             <button
               type="button"
@@ -48,7 +50,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               className="h-11 rounded-xl bg-primary-500 text-white text-sm font-semibold flex items-center justify-center gap-2"
             >
               <Home size={15} />
-              Trang chu
+              {translate(useStore.getState().readerSettings.language, 'home')}
             </button>
           </div>
         </section>

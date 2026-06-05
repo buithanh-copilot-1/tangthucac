@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { languages, readerThemes, translate, type TranslationKey } from '@story-reader/shared';
 import { useStore } from '../store/useStore';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -20,6 +21,7 @@ export default function SettingsScreen() {
 
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(currentUser?.username ?? '');
+  const t = (key: TranslationKey) => translate(readerSettings.language, key);
 
   const handleSaveName = () => {
     const trimmed = nameInput.trim();
@@ -235,17 +237,13 @@ export default function SettingsScreen() {
                 <Text style={styles.rowLabel}>Nền đọc</Text>
               </View>
               <View style={styles.segmented}>
-                {([
-                  { value: 'light', icon: '☀️' },
-                  { value: 'sepia', icon: '📜' },
-                  { value: 'dark', icon: '🌙' },
-                ] as const).map((t) => (
+                {readerThemes.map((theme) => (
                   <TouchableOpacity
-                    key={t.value}
-                    onPress={() => updateReaderSettings({ theme: t.value })}
-                    style={[styles.seg, readerSettings.theme === t.value && styles.segActive]}
+                    key={theme.value}
+                    onPress={() => updateReaderSettings({ theme: theme.value })}
+                    style={[styles.seg, readerSettings.theme === theme.value && styles.segActive]}
                   >
-                    <Text style={{ fontSize: 14 }}>{t.icon}</Text>
+                    <View style={[styles.themeDot, { backgroundColor: theme.swatch }]} />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -284,9 +282,21 @@ export default function SettingsScreen() {
                 <View style={[styles.iconBox, { backgroundColor: '#f5f3ff' }]}>
                   <Ionicons name="globe-outline" size={18} color="#8b5cf6" />
                 </View>
-                <Text style={styles.rowLabel}>Ngôn ngữ</Text>
+                <Text style={styles.rowLabel}>{t('language')}</Text>
               </View>
-              <Text style={styles.valueText}>Tiếng Việt</Text>
+              <View style={styles.segmented}>
+                {languages.map((language) => (
+                  <TouchableOpacity
+                    key={language.value}
+                    onPress={() => updateReaderSettings({ language: language.value })}
+                    style={[styles.seg, readerSettings.language === language.value && styles.segActive]}
+                  >
+                    <Text style={[styles.segText, readerSettings.language === language.value && styles.segTextActive]}>
+                      {language.shortLabel}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
             <View style={styles.divider} />
             <View style={styles.menuItem}>
@@ -294,7 +304,7 @@ export default function SettingsScreen() {
                 <View style={[styles.iconBox, { backgroundColor: '#f0fdf4' }]}>
                   <Ionicons name="information-circle-outline" size={18} color="#22c55e" />
                 </View>
-                <Text style={styles.rowLabel}>Phiên bản</Text>
+                <Text style={styles.rowLabel}>{t('version')}</Text>
               </View>
               <Text style={styles.valueText}>1.0.0</Text>
             </View>
@@ -367,9 +377,10 @@ const styles = StyleSheet.create({
   rowLabel: { fontSize: 14, fontWeight: '500', color: '#1e293b' },
   valueText: { fontSize: 13, color: '#94a3b8' },
   divider: { height: 1, backgroundColor: '#f8fafc', marginHorizontal: 14 },
-  segmented: { flexDirection: 'row', gap: 4 },
+  segmented: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 4, maxWidth: 220 },
   seg: { width: 32, height: 32, borderRadius: 8, borderWidth: 1.5, borderColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' },
   segActive: { borderColor: '#ef4444', backgroundColor: '#fff1f2' },
   segText: { fontSize: 11, fontWeight: '700', color: '#94a3b8' },
   segTextActive: { color: '#ef4444' },
+  themeDot: { width: 16, height: 16, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(15, 23, 42, 0.18)' },
 });
