@@ -1,0 +1,244 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+}
+
+enum Genre {
+  TIEN_HIEP
+  NGON_TINH
+  DO_THI
+  KIEM_HIEP
+  DI_GIOI
+  TRONG_SINH
+  HUYEN_HUYEN
+  KHOA_HOC_VIEN_TUONG
+}
+
+enum StoryStatus {
+  ONGOING
+  COMPLETED
+  HIATUS
+}
+
+enum ShelfStatus {
+  READING
+  COMPLETED
+  WANT_TO_READ
+}
+
+// ─────────────────────────────────────────────
+// Auth & Users
+// ─────────────────────────────────────────────
+
+model User {
+  id            String       @id @default(uuid())
+  username      String       @unique @db.VarChar(20)
+  displayName   String?      @db.VarChar(100)
+  givenName     String?      @db.VarChar(100)
+  familyName    String?      @db.VarChar(100)
+  email         String       @unique @db.VarChar(255)
+  emailVerified Boolean      @default(false)
+  passwordHash  String?      @db.VarChar(255) // NULL for Google-only users
+  googleId      String?      @unique @db.VarChar(100)
+  avatarUrl     String?      @db.Text
+  provider      AuthProvider @default(EMAIL)
+  isActive      Boolean      @default(true)
+  settings      Json?        // { fontSize, theme, lineHeight, fontFamily }
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  refreshTokens   RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  readingProgress ReadingProgress[]
+  shelf           ShelfEntry[]
+  bookmarks       Bookmark[]
+  ratings         Rating[]
+  comments        Comment[]
+
+  @@index([email])
+}
+
+/// JWT refresh tokens — stored as bcrypt hash, rotated on every use
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @db.VarChar(255)
+  expiresAt DateTime
+  revokedAt DateTime? // NULL = still valid
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @db.VarChar(255)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ─────────────────────────────────────────────
+// Stories & Chapters
+// ─────────────────────────────────────────────
+
+model Story {
+  id            String      @id @default(uuid())
+  title         String      @db.VarChar(255)
+  author        String      @db.VarChar(100)
+  coverUrl      String?     @db.Text
+  genre         Genre
+  tags          String[]    // e.g. ["tu tiên", "huyền huyễn"]
+  description   String      @db.Text
+  status        StoryStatus @default(ONGOING)
+  totalChapters Int         @default(0)
+  views         Int         @default(0)
+  rating        Float       @default(0)
+  ratingCount   Int         @default(0)
+  isFeatured    Boolean     @default(false)
+  isHot         Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  chapters        Chapter[]
+  shelf           ShelfEntry[]
+  bookmarks       Bookmark[]
+  ratings         Rating[]
+  comments        Comment[]
+  readingProgress ReadingProgress[]
+
+  @@index([genre])
+  @@index([status])
+  @@index([isFeatured])
+  @@index([isHot])
+}
+
+model Chapter {
+  id          String   @id @default(uuid())
+  storyId     String
+  number      Int
+  title       String   @db.VarChar(255)
+  content     String   @db.Text
+  wordCount   Int      @default(0)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  story           Story             @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  readingProgress ReadingProgress[]
+
+  @@unique([storyId, number])
+  @@index([storyId])
+}
+
+// ─────────────────────────────────────────────
+// User — Story interactions
+// ─────────────────────────────────────────────
+
+/// Lưu tiến độ đọc theo user + truyện (1 record duy nhất mỗi cặp)
+model ReadingProgress {
+  id             String   @id @default(uuid())
+  userId         String
+  storyId        String
+  chapterId      String
+  chapterNumber  Int
+  scrollPosition Float    @default(0)
+  lastRead       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story   Story   @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId])
+  @@index([userId])
+  @@index([storyId])
+}
+
+/// Tủ truyện: Đang đọc / Đã đọc / Muốn đọc
+model ShelfEntry {
+  id          String      @id @default(uuid())
+  userId      String
+  storyId     String
+  status      ShelfStatus
+  completedAt DateTime?
+  addedAt     DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId])
+  @@index([userId])
+  @@index([userId, status])
+}
+
+/// Đánh dấu yêu thích
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  storyId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId])
+  @@index([userId])
+}
+
+/// Đánh giá truyện (1-5 sao)
+model Rating {
+  id        String   @id @default(uuid())
+  userId    String
+  storyId   String
+  score     Int // 1..5
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId])
+  @@index([storyId])
+}
+
+/// Bình luận truyện (hỗ trợ reply 1 cấp qua parentId)
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  storyId   String
+  parentId  String? // null = comment gốc, có giá trị = reply
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story    Story     @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([storyId])
+  @@index([parentId])
+}

@@ -1,0 +1,34 @@
+# Packages workspace (.storybook, packages)
+node_modules/
+
+# Env
+# .env
+# .env.local
+
+# Logs
+logs/
+*.log
+
+# Build / bundler
+dist/
+build/
+.cache/
+
+# Expo / React Native (mobile package)
+.expo/
+.expo-shared/
+android/
+ios/
+
+# Vite / Web
+dist/
+
+# Editor
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo

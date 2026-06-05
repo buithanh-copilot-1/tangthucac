@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@story-reader/shared": ["../shared/src"],
+      "@story-reader/shared/*": ["../shared/src/*"]
+    }
+  }
+}

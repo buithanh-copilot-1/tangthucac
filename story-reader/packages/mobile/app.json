@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "TruyệnHay",
+    "slug": "story-reader",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ef4444"
+    },
+    "ios": {
+      "bundleIdentifier": "com.storyreader.app",
+      "buildNumber": "1",
+      "supportsTablet": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ef4444"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

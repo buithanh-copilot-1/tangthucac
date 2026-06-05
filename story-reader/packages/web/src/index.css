@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+    overscroll-behavior: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+}
+
+@layer components {
+  .story-card-hover {
+    @apply transition-transform duration-200 active:scale-95;
+  }
+
+  .btn-primary {
+    @apply bg-primary-500 text-white rounded-full px-6 py-3 font-semibold text-sm
+           active:bg-primary-600 transition-colors duration-150 select-none;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-primary-500 border border-primary-500 rounded-full px-6 py-3
+           font-semibold text-sm active:bg-gray-50 transition-colors duration-150 select-none;
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Reader themes */
+.reader-light {
+  @apply bg-white text-gray-900;
+}
+
+.reader-sepia {
+  background-color: #fdf6e3;
+  color: #3d2b1f;
+}
+
+.reader-dark {
+  @apply bg-gray-900 text-gray-100;
+}
+
+/* Hide scrollbar for horizontal scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

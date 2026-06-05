@@ -1,0 +1,14 @@
+{
+  "name": "story-reader",
+  "private": true,
+  "workspaces": [
+    "packages/shared",
+    "packages/web",
+    "packages/mobile"
+  ],
+  "scripts": {
+    "web": "npm run dev --workspace=packages/web",
+    "mobile": "npm run start --workspace=packages/mobile",
+    "build:shared": "npm run build --workspace=packages/shared"
+  }
+}
