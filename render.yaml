@@ -3,7 +3,7 @@ services:
     name: story-reader-api
     env: node
     rootDir: story-reader-api
-    buildCommand: npm install && npx prisma generate && npm run build
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy && npm run build
     startCommand: node dist/main
     envVars:
       - key: DATABASE_URL

@@ -16,9 +16,11 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const port = config.get<number>('port') ?? 3000;
 
-  // CORS — dùng @fastify/cors thay vì enableCors (tương thích Fastify)
+  const isProduction = config.get<string>('nodeEnv') === 'production';
+  const frontendUrl = config.get<string>('frontendUrl') ?? 'http://localhost:4444';
+
   await app.register(fastifyCors, {
-    origin: true,          // cho phép mọi origin khi dev; đổi thành array URL khi production
+    origin: isProduction ? [frontendUrl] : true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
